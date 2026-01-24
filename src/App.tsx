@@ -15,6 +15,9 @@ import Analytics from "./pages/Analytics";
 import StudentsManagement from "./pages/StudentsManagement";
 import TestsManagement from "./pages/TestsManagement";
 import CoursesManagement from "./pages/CoursesManagement";
+import BatchesManagement from "./pages/BatchesManagement";
+import TeachersManagement from "./pages/TeachersManagement";
+import ScheduleManagement from "./pages/ScheduleManagement";
 import NotFound from "./pages/NotFound";
 
 type UserRole = "admin" | "teacher" | "student";
@@ -183,11 +186,52 @@ const App = () => {
                     }
                   />
                 )}
+                {/* Admin-only routes */}
+                {user.role === "admin" && (
+                  <>
+                    <Route
+                      path="/batches"
+                      element={
+                        <DashboardLayout
+                          role={user.role}
+                          userName={user.name}
+                          onLogout={handleLogout}
+                        >
+                          <BatchesManagement />
+                        </DashboardLayout>
+                      }
+                    />
+                    <Route
+                      path="/teachers"
+                      element={
+                        <DashboardLayout
+                          role={user.role}
+                          userName={user.name}
+                          onLogout={handleLogout}
+                        >
+                          <TeachersManagement />
+                        </DashboardLayout>
+                      }
+                    />
+                  </>
+                )}
+                {/* Schedule route - available for admin and teacher */}
+                {(user.role === "admin" || user.role === "teacher") && (
+                  <Route
+                    path="/schedule"
+                    element={
+                      <DashboardLayout
+                        role={user.role}
+                        userName={user.name}
+                        onLogout={handleLogout}
+                      >
+                        <ScheduleManagement />
+                      </DashboardLayout>
+                    }
+                  />
+                )}
                 {/* Placeholder routes - redirect to dashboard */}
-                <Route path="/batches" element={<Navigate to="/dashboard" replace />} />
-                <Route path="/teachers" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/questions" element={<Navigate to="/dashboard" replace />} />
-                <Route path="/schedule" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/results" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/leaderboard" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/notifications" element={<Navigate to="/dashboard" replace />} />
