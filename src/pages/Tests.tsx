@@ -139,13 +139,21 @@ export default function Tests() {
               <span>{test.time}</span>
             </div>
             {test.status === "upcoming" && (
-              <Button variant="accent" size="sm">
+              <Button 
+                variant="accent" 
+                size="sm"
+                onClick={() => navigate(`/take-test/${test.id}`)}
+              >
                 <Play className="h-4 w-4 mr-1" />
                 Start
               </Button>
             )}
             {test.status === "ongoing" && (
-              <Button variant="success" size="sm">
+              <Button 
+                variant="success" 
+                size="sm"
+                onClick={() => navigate(`/take-test/${test.id}`)}
+              >
                 <Play className="h-4 w-4 mr-1" />
                 Resume
               </Button>

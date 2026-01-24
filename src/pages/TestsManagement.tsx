@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -300,6 +301,13 @@ export default function TestsManagement() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => navigate(`/test-submissions/${test.id}`)}
+                          >
+                            View Submissions
+                          </Button>
                           <Button
                             variant="ghost"
                             size="icon"
