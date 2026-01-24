@@ -92,7 +92,7 @@ export default function Tests() {
         <CardContent className="p-5">
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center">
                 <FileText className="h-6 w-6 text-primary-foreground" />
               </div>
               <div>

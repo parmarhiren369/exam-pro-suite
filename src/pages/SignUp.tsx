@@ -45,21 +45,21 @@ export default function SignUp({ onSignUp }: SignUpProps) {
       title: "Administrator",
       description: "Manage institute, courses & faculty",
       icon: Shield,
-      gradient: "from-primary to-primary/70",
+      bgColor: "bg-primary",
     },
     {
       id: "teacher" as UserRole,
       title: "Faculty / Teacher",
       description: "Create tests & analyze performance",
       icon: Users,
-      gradient: "from-success to-success/70",
+      bgColor: "bg-success",
     },
     {
       id: "student" as UserRole,
       title: "Student",
       description: "Attempt tests & track progress",
       icon: GraduationCap,
-      gradient: "from-accent to-orange-400",
+      bgColor: "bg-accent",
     },
   ];
 
@@ -131,7 +131,7 @@ export default function SignUp({ onSignUp }: SignUpProps) {
   return (
     <div className="min-h-screen flex">
       {/* Left Panel - Hero Section */}
-      <div className="hidden lg:flex lg:w-[55%] gradient-hero hero-pattern relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-[55%] bg-primary hero-pattern relative overflow-hidden">
         {/* Floating Decorations */}
         <div className="absolute top-20 right-20 w-64 h-64 rounded-full bg-accent/10 blur-3xl animate-float" />
         <div className="absolute bottom-32 left-20 w-80 h-80 rounded-full bg-primary/20 blur-3xl animate-float" style={{ animationDelay: "1s" }} />
@@ -144,7 +144,7 @@ export default function SignUp({ onSignUp }: SignUpProps) {
           <div className="max-w-xl space-y-10">
             {/* Logo */}
             <div className="flex items-center gap-4 animate-fade-in-up">
-              <div className="w-16 h-16 rounded-2xl gradient-accent flex items-center justify-center shadow-glow-accent">
+              <div className="w-16 h-16 rounded-2xl bg-accent flex items-center justify-center shadow-glow-accent">
                 <span className="text-3xl font-bold">H</span>
               </div>
               <div>
@@ -194,20 +194,19 @@ export default function SignUp({ onSignUp }: SignUpProps) {
           </div>
         </div>
 
-        {/* Bottom Gradient Fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/20 to-transparent" />
+        {/* Bottom Fade */}
       </div>
 
       {/* Right Panel - Sign Up Form */}
       <div className="flex-1 flex items-center justify-center p-8 bg-background relative overflow-hidden">
         {/* Background Pattern */}
-        <div className="absolute inset-0 gradient-mesh opacity-50" />
+        <div className="absolute inset-0 bg-muted/30 opacity-50" />
         
         <div className="w-full max-w-md space-y-6 relative z-10 py-8">
           {/* Mobile Logo */}
           <div className="lg:hidden text-center animate-fade-in">
             <div className="inline-flex items-center gap-3 mb-6">
-              <div className="w-14 h-14 rounded-2xl gradient-accent flex items-center justify-center shadow-glow-accent">
+              <div className="w-14 h-14 rounded-2xl bg-accent flex items-center justify-center shadow-glow-accent">
                 <span className="text-2xl font-bold text-accent-foreground">H</span>
               </div>
               <div className="text-left">
@@ -242,7 +241,7 @@ export default function SignUp({ onSignUp }: SignUpProps) {
                   style={{ animationDelay: `${150 + index * 50}ms`, animationFillMode: "forwards" }}
                 >
                   <div
-                    className={`w-12 h-12 rounded-xl bg-gradient-to-br ${role.gradient} flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-105`}
+                    className={`w-12 h-12 rounded-xl ${role.bgColor} flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-105`}
                   >
                     <role.icon className="h-5 w-5 text-white" />
                   </div>

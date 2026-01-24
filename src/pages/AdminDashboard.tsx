@@ -42,14 +42,14 @@ export default function AdminDashboard() {
   ];
 
   const courses = [
-    { name: "JEE Main 2025", students: 1250, batches: 12, trend: "+8%", gradient: "from-primary to-primary/70" },
-    { name: "JEE Advanced 2025", students: 680, batches: 8, trend: "+12%", gradient: "from-success to-success/70" },
-    { name: "NEET 2025", students: 920, batches: 10, trend: "+15%", gradient: "from-accent to-orange-400" },
-    { name: "Foundation (Class 11)", students: 540, batches: 6, trend: "+5%", gradient: "from-info to-info/70" },
+    { name: "JEE Main 2025", students: 1250, batches: 12, trend: "+8%", bgColor: "bg-primary" },
+    { name: "JEE Advanced 2025", students: 680, batches: 8, trend: "+12%", bgColor: "bg-success" },
+    { name: "NEET 2025", students: 920, batches: 10, trend: "+15%", bgColor: "bg-accent" },
+    { name: "Foundation (Class 11)", students: 540, batches: 6, trend: "+5%", bgColor: "bg-info" },
   ];
 
   const getRankStyle = (rank: number) => {
-    if (rank === 1) return "gradient-accent text-accent-foreground shadow-glow-accent/30";
+    if (rank === 1) return "bg-accent text-accent-foreground shadow-glow-accent/30";
     if (rank === 2) return "bg-muted-foreground/20 text-foreground";
     if (rank === 3) return "bg-warning/20 text-warning";
     return "bg-muted text-muted-foreground";
@@ -194,7 +194,7 @@ export default function AdminDashboard() {
                 >
                   {performer.rank}
                 </div>
-                <div className={`w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center border border-primary/10`}>
+                <div className={`w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center border border-primary/10`}>
                   <span className="text-sm font-semibold text-primary">{performer.avatar}</span>
                 </div>
                 <div className="flex-1 min-w-0">
@@ -232,7 +232,7 @@ export default function AdminDashboard() {
                 style={{ animationDelay: `${600 + index * 50}ms` }}
               >
                 <div className="flex items-center justify-between mb-4">
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${course.gradient} flex items-center justify-center shadow-lg`}>
+                  <div className={`w-12 h-12 rounded-xl ${course.bgColor} flex items-center justify-center shadow-lg`}>
                     <BookOpen className="h-5 w-5 text-white" />
                   </div>
                   <div className="flex items-center gap-1 text-success text-sm font-medium">

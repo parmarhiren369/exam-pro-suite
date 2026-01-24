@@ -85,7 +85,7 @@ export function DashboardSidebar({ role, userName, onLogout }: DashboardSidebarP
       {/* Logo Section */}
       <div className="flex items-center justify-between p-4 border-b border-sidebar-border/50">
         <Link to="/dashboard" className="flex items-center gap-3 group">
-          <div className="w-11 h-11 rounded-xl gradient-accent flex items-center justify-center shadow-glow-accent/50 shrink-0 transition-transform group-hover:scale-105">
+          <div className="w-11 h-11 rounded-xl bg-accent flex items-center justify-center shadow-glow-accent/50 shrink-0 transition-transform group-hover:scale-105">
             <span className="text-xl font-bold text-accent-foreground">H</span>
           </div>
           {!collapsed && (
@@ -109,7 +109,7 @@ export function DashboardSidebar({ role, userName, onLogout }: DashboardSidebarP
       {!collapsed && (
         <div className="p-4 border-b border-sidebar-border/50 animate-fade-in">
           <div className="flex items-center gap-3 p-3 rounded-xl bg-sidebar-accent/50 backdrop-blur-sm">
-            <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${roleColors[role]} flex items-center justify-center shadow-lg`}>
+            <div className={`w-10 h-10 rounded-xl ${roleColors[role]} flex items-center justify-center shadow-lg`}>
               <span className="text-sm font-bold text-white">{userName.charAt(0).toUpperCase()}</span>
             </div>
             <div className="flex-1 min-w-0">
@@ -140,7 +140,7 @@ export function DashboardSidebar({ role, userName, onLogout }: DashboardSidebarP
               style={{ animationDelay: `${index * 30}ms` }}
             >
               {isActive && (
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer" />
+                <div className="absolute inset-0 bg-white/10 animate-shimmer" />
               )}
               <item.icon className={cn(
                 "h-5 w-5 shrink-0 transition-transform duration-200",

@@ -261,9 +261,9 @@ export default function TeacherDashboard() {
                 <div className="relative h-3 rounded-full bg-muted overflow-hidden">
                   <div 
                     className={`absolute inset-y-0 left-0 rounded-full transition-all duration-1000 ease-out ${
-                      topic.avgScore >= 75 ? "bg-gradient-to-r from-success to-success/70" : 
-                      topic.avgScore >= 60 ? "bg-gradient-to-r from-warning to-warning/70" : 
-                      "bg-gradient-to-r from-destructive to-destructive/70"
+                      topic.avgScore >= 75 ? "bg-success" : 
+                      topic.avgScore >= 60 ? "bg-warning" : 
+                      "bg-destructive"
                     }`}
                     style={{ width: `${topic.avgScore}%` }}
                   />

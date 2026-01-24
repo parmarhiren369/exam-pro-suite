@@ -60,7 +60,7 @@ export default function StudentDashboard() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-fade-in-up">
         <div>
           <div className="flex items-center gap-3 mb-2">
-            <div className="px-3 py-1.5 rounded-full gradient-accent text-accent-foreground text-sm font-semibold flex items-center gap-2 shadow-glow-accent/30">
+            <div className="px-3 py-1.5 rounded-full bg-accent text-accent-foreground text-sm font-semibold flex items-center gap-2 shadow-glow-accent/30">
               <Flame className="h-4 w-4" />
               {streakData.current} Day Streak!
             </div>
@@ -138,10 +138,10 @@ export default function StudentDashboard() {
             {upcomingTests.map((test, index) => (
               <div
                 key={test.id}
-                className="flex flex-col sm:flex-row sm:items-center justify-between p-5 rounded-2xl border-2 border-border/50 bg-gradient-to-r from-muted/30 to-transparent hover:border-accent/30 hover:shadow-premium transition-all group"
+                className="flex flex-col sm:flex-row sm:items-center justify-between p-5 rounded-2xl border-2 border-border/50 bg-muted/30 hover:border-accent/30 hover:shadow-premium transition-all group"
               >
                 <div className="flex items-center gap-4 mb-4 sm:mb-0">
-                  <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center shadow-glow-primary/30">
+                  <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center shadow-glow-primary/30">
                     <FileText className="h-7 w-7 text-primary-foreground" />
                   </div>
                   <div>
@@ -194,10 +194,10 @@ export default function StudentDashboard() {
                 </div>
                 <div className="relative h-3 rounded-full bg-muted overflow-hidden">
                   <div 
-                    className={`absolute inset-y-0 left-0 rounded-full bg-gradient-to-r ${subject.color} transition-all duration-1000 ease-out`}
+                    className={`absolute inset-y-0 left-0 rounded-full ${subject.color.replace('from-', 'bg-').replace(/to-.*/, '')} transition-all duration-1000 ease-out`}
                     style={{ width: `${subject.progress}%` }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
+                  <div className="absolute inset-0 bg-white/10 animate-shimmer" />
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Progress</span>

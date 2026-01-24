@@ -128,7 +128,7 @@ export default function Analytics() {
                   <span className="text-sm font-medium">+5% from last month</span>
                 </div>
               </div>
-              <div className="w-14 h-14 rounded-xl gradient-primary flex items-center justify-center">
+              <div className="w-14 h-14 rounded-xl bg-primary flex items-center justify-center">
                 <Target className="h-7 w-7 text-primary-foreground" />
               </div>
             </div>
@@ -146,7 +146,7 @@ export default function Analytics() {
                   <span className="text-sm">This semester</span>
                 </div>
               </div>
-              <div className="w-14 h-14 rounded-xl gradient-accent flex items-center justify-center">
+              <div className="w-14 h-14 rounded-xl bg-accent flex items-center justify-center">
                 <FileText className="h-7 w-7 text-accent-foreground" />
               </div>
             </div>
@@ -164,7 +164,7 @@ export default function Analytics() {
                   <span className="text-sm font-medium">JEE Main Mock 12</span>
                 </div>
               </div>
-              <div className="w-14 h-14 rounded-xl gradient-success flex items-center justify-center">
+              <div className="w-14 h-14 rounded-xl bg-success flex items-center justify-center">
                 <Award className="h-7 w-7 text-success-foreground" />
               </div>
             </div>
