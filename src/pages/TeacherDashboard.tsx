@@ -1,5 +1,6 @@
 import { StatCard } from "@/components/ui/stat-card";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 import { 
   FileText, 
   PenTool, 
@@ -30,6 +31,8 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 
 export default function TeacherDashboard() {
+  const navigate = useNavigate();
+  
   const recentQuestions = [
     { id: 1, topic: "Thermodynamics", chapter: "Physics", type: "MCQ", difficulty: "Hard", status: "approved" },
     { id: 2, topic: "Organic Chemistry", chapter: "Chemistry", type: "MCQ", difficulty: "Medium", status: "pending" },
@@ -92,11 +95,21 @@ export default function TeacherDashboard() {
           <p className="text-muted-foreground mt-1">Manage your questions, tests, and track student performance.</p>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline" size="default" className="rounded-xl border-2">
+          <Button 
+            variant="outline" 
+            size="default" 
+            className="rounded-xl border-2"
+            onClick={() => navigate("/analytics")}
+          >
             <Upload className="h-4 w-4 mr-2" />
             Upload Solutions
           </Button>
-          <Button variant="accent" size="default" className="rounded-xl shadow-glow-accent/30">
+          <Button 
+            variant="accent" 
+            size="default" 
+            className="rounded-xl shadow-glow-accent/30"
+            onClick={() => navigate("/tests-management")}
+          >
             <Plus className="h-4 w-4 mr-2" />
             Create Test
           </Button>

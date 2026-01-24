@@ -103,7 +103,7 @@ export default function Login({ onLogin }: LoginProps) {
               <h2 className="text-4xl font-bold leading-tight tracking-tight">
                 The Complete Exam
                 <br />
-                <span className="text-gradient">Management Platform</span>
+                <span className="text-accent">Management Platform</span>
               </h2>
               <p className="text-lg text-primary-foreground/60 max-w-md leading-relaxed">
                 Trusted by 500+ coaching institutes. Prepare students for JEE, NEET & competitive exams with AI-powered analytics.

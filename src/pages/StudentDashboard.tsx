@@ -1,5 +1,6 @@
 import { StatCard } from "@/components/ui/stat-card";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 import { 
   FileText, 
   Trophy, 
@@ -29,6 +30,8 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 
 export default function StudentDashboard() {
+  const navigate = useNavigate();
+  
   const upcomingTests = [
     { id: 1, name: "JEE Main Mock Test 16", date: "Tomorrow", time: "9:00 AM", duration: "3 hours", type: "Full Syllabus", difficulty: "Hard" },
     { id: 2, name: "Physics Chapter Test", date: "Jan 26", time: "2:00 PM", duration: "1.5 hours", type: "Chapter", difficulty: "Medium" },
@@ -73,11 +76,21 @@ export default function StudentDashboard() {
           <p className="text-muted-foreground mt-1">Keep pushing towards your goals. You're doing great!</p>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline" size="default" className="rounded-xl border-2">
+          <Button 
+            variant="outline" 
+            size="default" 
+            className="rounded-xl border-2"
+            onClick={() => navigate("/analytics")}
+          >
             <BarChart3 className="h-4 w-4 mr-2" />
             My Progress
           </Button>
-          <Button variant="accent" size="default" className="rounded-xl shadow-glow-accent/30">
+          <Button 
+            variant="accent" 
+            size="default" 
+            className="rounded-xl shadow-glow-accent/30"
+            onClick={() => navigate("/tests")}
+          >
             <Play className="h-4 w-4 mr-2" />
             Start Practice
           </Button>

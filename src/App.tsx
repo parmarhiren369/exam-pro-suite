@@ -14,6 +14,7 @@ import Tests from "./pages/Tests";
 import Analytics from "./pages/Analytics";
 import StudentsManagement from "./pages/StudentsManagement";
 import TestsManagement from "./pages/TestsManagement";
+import CoursesManagement from "./pages/CoursesManagement";
 import NotFound from "./pages/NotFound";
 
 type UserRole = "admin" | "teacher" | "student";
@@ -143,6 +144,18 @@ const App = () => {
                       }
                     />
                     <Route
+                      path="/courses"
+                      element={
+                        <DashboardLayout
+                          role={user.role}
+                          userName={user.name}
+                          onLogout={handleLogout}
+                        >
+                          <CoursesManagement />
+                        </DashboardLayout>
+                      }
+                    />
+                    <Route
                       path="/tests-management"
                       element={
                         <DashboardLayout
@@ -171,7 +184,6 @@ const App = () => {
                   />
                 )}
                 {/* Placeholder routes - redirect to dashboard */}
-                <Route path="/courses" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/batches" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/teachers" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/questions" element={<Navigate to="/dashboard" replace />} />

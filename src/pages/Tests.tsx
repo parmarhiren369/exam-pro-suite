@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -57,6 +58,7 @@ const testsData: Test[] = [
 ];
 
 export default function Tests() {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [courseFilter, setCourseFilter] = useState("all");
 

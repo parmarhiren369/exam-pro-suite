@@ -140,7 +140,7 @@ export default function AdminDashboard() {
               <CardTitle className="text-xl font-bold">Recent Tests</CardTitle>
               <CardDescription>Latest examination activities</CardDescription>
             </div>
-            <Button variant="ghost" size="sm" className="text-accent hover:text-accent/80 font-medium">
+            <Button variant="ghost" size="sm" className="text-accent hover:text-accent/80 font-medium" onClick={() => navigate("/tests-management")}>
               View All <ChevronRight className="h-4 w-4 ml-1" />
             </Button>
           </CardHeader>
@@ -231,7 +231,7 @@ export default function AdminDashboard() {
             <CardTitle className="text-xl font-bold">Courses Overview</CardTitle>
             <CardDescription>Active programs and enrollment trends</CardDescription>
           </div>
-          <Button variant="outline" size="sm" className="rounded-xl border-2">
+          <Button variant="outline" size="sm" className="rounded-xl border-2" onClick={() => navigate("/courses")}>
             <Plus className="h-4 w-4 mr-2" />
             Add Course
           </Button>
