@@ -30,7 +30,6 @@ import {
   Calendar,
   Filter,
 } from "lucide-react";
-import { mockTests } from "@/lib/mockData";
 import { Test, TestStatus } from "@/lib/types";
 import { TestDialog } from "@/components/dialogs/TestDialog";
 import { useToast } from "@/hooks/use-toast";
@@ -45,7 +44,7 @@ import {
 export default function TestsManagement() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [tests, setTests] = useState<Test[]>(mockTests);
+  const [tests, setTests] = useState<Test[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [dialogOpen, setDialogOpen] = useState(false);

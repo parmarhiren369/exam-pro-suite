@@ -30,13 +30,12 @@ import {
   Award,
   TrendingUp,
 } from "lucide-react";
-import { mockTeachers } from "@/lib/mockData";
 import { Teacher } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 
 export default function TeachersManagement() {
   const { toast } = useToast();
-  const [teachers, setTeachers] = useState<Teacher[]>(mockTeachers);
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [subjectFilter, setSubjectFilter] = useState<string>("all");
 

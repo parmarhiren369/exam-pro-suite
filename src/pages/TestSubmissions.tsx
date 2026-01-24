@@ -36,7 +36,6 @@ import {
   Eye,
   Search,
 } from "lucide-react";
-import { mockTests, mockQuestions } from "@/lib/mockData";
 import { useToast } from "@/hooks/use-toast";
 
 interface Submission {
@@ -65,8 +64,9 @@ export default function TestSubmissions() {
   const [searchQuery, setSearchQuery] = useState("");
   const [feedback, setFeedback] = useState("");
 
-  const test = mockTests.find((t) => t.id === testId);
-  const testQuestions = mockQuestions.slice(0, 10);
+  // Note: In production, fetch test and questions data from API
+  const test = null; // mockTests.find((t) => t.id === testId);
+  const testQuestions: any[] = []; // mockQuestions.slice(0, 10);
 
   useEffect(() => {
     // Load submissions from localStorage

@@ -19,7 +19,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Test, TestType } from "@/lib/types";
-import { mockCourses } from "@/lib/mockData";
 
 interface TestDialogProps {
   open: boolean;
@@ -155,11 +154,10 @@ export function TestDialog({
                     <SelectValue placeholder="Select course" />
                   </SelectTrigger>
                   <SelectContent>
-                    {mockCourses.map((course) => (
-                      <SelectItem key={course.id} value={course.name}>
-                        {course.name}
-                      </SelectItem>
-                    ))}
+                    {/* Note: In production, fetch courses from API */}
+                    <SelectItem value="JEE Main 2025">JEE Main 2025</SelectItem>
+                    <SelectItem value="JEE Advanced 2025">JEE Advanced 2025</SelectItem>
+                    <SelectItem value="NEET 2025">NEET 2025</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

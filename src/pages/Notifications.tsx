@@ -21,7 +21,6 @@ import {
   Info,
   X,
 } from "lucide-react";
-import { mockNotifications } from "@/lib/mockData";
 import { Notification } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 
@@ -35,7 +34,7 @@ export default function Notifications({ userRole, userId = "S001" }: Notificatio
   
   // Generate role-specific notifications
   const getRoleNotifications = (): Notification[] => {
-    const baseNotifications = [...mockNotifications];
+    const baseNotifications: Notification[] = [];
     
     if (userRole === "admin") {
       return [

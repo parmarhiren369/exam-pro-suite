@@ -22,15 +22,15 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { mockTests, mockQuestions } from "@/lib/mockData";
 
 export default function TakeTest() {
   const { testId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const test = mockTests.find((t) => t.id === testId);
-  const testQuestions = test ? mockQuestions.slice(0, 10) : []; // Get first 10 questions for the test
+  // Note: In production, fetch test data from API
+  const test = null; // mockTests.find((t) => t.id === testId);
+  const testQuestions: any[] = []; // test ? mockQuestions.slice(0, 10) : [];
 
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string>>({});

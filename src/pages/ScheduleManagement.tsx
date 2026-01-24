@@ -20,7 +20,6 @@ import {
   Edit,
   Trash2,
 } from "lucide-react";
-import { mockTests, mockBatches } from "@/lib/mockData";
 import { useToast } from "@/hooks/use-toast";
 
 export default function ScheduleManagement() {
@@ -211,7 +210,7 @@ export default function ScheduleManagement() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Active Batches</p>
-                <p className="text-3xl font-bold text-foreground mt-1">{mockBatches.length}</p>
+                <p className="text-3xl font-bold text-foreground mt-1">0</p>
               </div>
               <div className="w-12 h-12 rounded-xl bg-info flex items-center justify-center">
                 <Users className="h-6 w-6 text-white" />

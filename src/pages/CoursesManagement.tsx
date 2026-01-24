@@ -28,12 +28,11 @@ import {
   TrendingUp,
   Filter,
 } from "lucide-react";
-import { mockCourses } from "@/lib/mockData";
 import { Course } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 
 export default function CoursesManagement() {
-  const [courses, setCourses] = useState<Course[]>(mockCourses);
+  const [courses, setCourses] = useState<Course[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
 

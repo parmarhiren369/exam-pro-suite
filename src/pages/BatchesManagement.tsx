@@ -28,13 +28,12 @@ import {
   MapPin,
   GraduationCap,
 } from "lucide-react";
-import { mockBatches, mockCourses, mockTeachers } from "@/lib/mockData";
 import { Batch } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 
 export default function BatchesManagement() {
   const { toast } = useToast();
-  const [batches, setBatches] = useState<Batch[]>(mockBatches);
+  const [batches, setBatches] = useState<Batch[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredBatches = batches.filter(
@@ -49,14 +48,6 @@ export default function BatchesManagement() {
       title: "Batch Deleted",
       description: "The batch has been successfully deleted.",
     });
-  };
-
-  const getCourseInfo = (courseName: string) => {
-    return mockCourses.find((c) => c.name === courseName);
-  };
-
-  const getTeacherInfo = (teacherId: string) => {
-    return mockTeachers.find((t) => t.id === teacherId);
   };
 
   // Mock centers data

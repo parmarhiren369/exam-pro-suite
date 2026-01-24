@@ -18,7 +18,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Student } from "@/lib/types";
-import { mockCourses, mockBatches } from "@/lib/mockData";
 
 interface StudentDialogProps {
   open: boolean;
@@ -111,11 +110,10 @@ export function StudentDialog({
                   <SelectValue placeholder="Select course" />
                 </SelectTrigger>
                 <SelectContent>
-                  {mockCourses.map((course) => (
-                    <SelectItem key={course.id} value={course.name}>
-                      {course.name}
-                    </SelectItem>
-                  ))}
+                  {/* Note: In production, fetch courses from API */}
+                  <SelectItem value="JEE Main 2025">JEE Main 2025</SelectItem>
+                  <SelectItem value="JEE Advanced 2025">JEE Advanced 2025</SelectItem>
+                  <SelectItem value="NEET 2025">NEET 2025</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -131,11 +129,10 @@ export function StudentDialog({
                   <SelectValue placeholder="Select batch" />
                 </SelectTrigger>
                 <SelectContent>
-                  {mockBatches.map((batch) => (
-                    <SelectItem key={batch.id} value={batch.name}>
-                      {batch.name}
-                    </SelectItem>
-                  ))}
+                  {/* Note: In production, fetch batches from API */}
+                  <SelectItem value="Batch A">Batch A</SelectItem>
+                  <SelectItem value="Batch B">Batch B</SelectItem>
+                  <SelectItem value="Batch C">Batch C</SelectItem>
                 </SelectContent>
               </Select>
             </div>

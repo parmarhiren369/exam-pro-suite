@@ -36,13 +36,12 @@ import {
   Phone,
   GraduationCap,
 } from "lucide-react";
-import { mockStudents, mockCourses } from "@/lib/mockData";
 import { Student } from "@/lib/types";
 import { StudentDialog } from "@/components/dialogs/StudentDialog";
 import { useToast } from "@/hooks/use-toast";
 
 export default function StudentsManagement() {
-  const [students, setStudents] = useState<Student[]>(mockStudents);
+  const [students, setStudents] = useState<Student[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCourse, setSelectedCourse] = useState<string>("all");
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -174,7 +173,7 @@ export default function StudentsManagement() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Active Courses</p>
-                <p className="text-2xl font-bold">{mockCourses.length}</p>
+                <p className="text-2xl font-bold">0</p>
               </div>
               <GraduationCap className="h-8 w-8 text-success" />
             </div>
@@ -224,11 +223,10 @@ export default function StudentsManagement() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Courses</SelectItem>
-                {mockCourses.map((course) => (
-                  <SelectItem key={course.id} value={course.name}>
-                    {course.name}
-                  </SelectItem>
-                ))}
+                {/* Note: In production, fetch courses from API */}
+                <SelectItem value="JEE Main 2025">JEE Main 2025</SelectItem>
+                <SelectItem value="JEE Advanced 2025">JEE Advanced 2025</SelectItem>
+                <SelectItem value="NEET 2025">NEET 2025</SelectItem>
               </SelectContent>
             </Select>
           </div>
