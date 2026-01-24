@@ -79,6 +79,16 @@ export default function TestsManagement() {
     console.log('Save Test called with data:', testData);
     console.log('Questions:', questions);
     
+    // Validate questions
+    if (!questions || questions.length === 0) {
+      toast({
+        title: "No Questions",
+        description: "Please add at least one question to the test.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     try {
       if (editingTest) {
         // Update existing test
@@ -95,17 +105,26 @@ export default function TestsManagement() {
         // Create questions first and get their IDs
         const questionIds: string[] = [];
         for (const questionData of questions) {
-          const questionId = await createQuestion({
-            ...questionData,
-            subject: testData.course || "",
-            topic: "",
-            chapter: "",
-            difficulty: "Medium",
-            createdBy: "current-teacher-id", // TODO: Get from auth context
-            status: "approved",
-          });
-          questionIds.push(questionId);
+          console.log('Creating question:', questionData);
+          try {
+            const questionId = await createQuestion({
+              ...questionData,
+              subject: testData.course || "",
+              topic: "",
+              chapter: "",
+              difficulty: "Medium",
+              createdBy: "current-teacher-id", // TODO: Get from auth context
+              status: "approved",
+            });
+            console.log('Question created with ID:', questionId);
+            questionIds.push(questionId);
+          } catch (qError) {
+            console.error('Error creating question:', qError);
+            throw new Error(`Failed to create question: ${qError}`);
+          }
         }
+
+        console.log('All questions created, IDs:', questionIds);
 
         // Create the test with question IDs
         const testId = await createTest({
@@ -116,6 +135,8 @@ export default function TestsManagement() {
           allowedStudents: ["all"],
           attemptedBy: [],
         });
+
+        console.log('Test created with ID:', testId);
 
         // Add to local state for display
         const newTest: Test = {
@@ -145,11 +166,13 @@ export default function TestsManagement() {
           description: `New test created with ${questions.length} questions.`,
         });
       }
-    } catch (error) {
-      console.error('Error saving test:', error);
+    } catch (error: any) {
+      console.error('Error saving test - Full error:', error);
+      console.error('Error message:', error?.message);
+      console.error('Error stack:', error?.stack);
       toast({
         title: "Error",
-        description: "Failed to save test. Please try again.",
+        description: error?.message || "Failed to save test. Please try again.",
         variant: "destructive",
       });
     }
