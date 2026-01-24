@@ -344,6 +344,9 @@ export default function TestsManagement() {
               </TableBody>
             </Table>
           </div>
+        </CardContent>
+      </Card>
+
       {console.log('TestDialog render, dialogOpen:', dialogOpen)}
       <TestDialog
         open={dialogOpen}
