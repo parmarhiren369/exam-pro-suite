@@ -27,6 +27,7 @@ type UserRole = "admin" | "teacher" | "student";
 interface User {
   role: UserRole;
   name: string;
+  email: string;
 }
 
 const queryClient = new QueryClient();
@@ -35,7 +36,8 @@ const App = () => {
   const [user, setUser] = useState<User | null>(null);
 
   const handleLogin = (role: UserRole, name: string) => {
-    setUser({ role, name });
+    const email = `${name.toLowerCase().replace(/\s+/g, '.')}@example.com`;
+    setUser({ role, name, email });
   };
 
   const handleLogout = () => {
@@ -253,7 +255,7 @@ const App = () => {
                       userName={user.name}
                       onLogout={handleLogout}
                     >
-                      <Settings userRole={user.role} userName={user.name} />
+                      <Settings userRole={user.role} userName={user.name} userEmail={user.email} />
                     </DashboardLayout>
                   }
                 />
