@@ -266,12 +266,33 @@ export default function Login({ onLogin }: LoginProps) {
             </div>
           )}
 
-          <p className="text-center text-sm text-muted-foreground pt-4">
-            Need help?{" "}
-            <a href="#" className="text-accent hover:text-accent/80 font-semibold transition-colors">
-              Contact Support
-            </a>
-          </p>
+          <div className="space-y-4 pt-4">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-border" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">Or</span>
+              </div>
+            </div>
+            
+            <p className="text-center text-sm text-muted-foreground">
+              Don't have an account?{" "}
+              <button 
+                onClick={() => navigate("/signup")}
+                className="text-accent hover:text-accent/80 font-semibold transition-colors hover:underline"
+              >
+                Sign Up Now
+              </button>
+            </p>
+
+            <p className="text-center text-sm text-muted-foreground">
+              Need help?{" "}
+              <a href="#" className="text-accent hover:text-accent/80 font-semibold transition-colors">
+                Contact Support
+              </a>
+            </p>
+          </div>
         </div>
       </div>
     </div>

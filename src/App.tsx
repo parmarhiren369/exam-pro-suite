@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import Login from "./pages/Login";
+import SignUp from "./pages/SignUp";
 import AdminDashboard from "./pages/AdminDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import StudentDashboard from "./pages/StudentDashboard";
@@ -61,6 +62,26 @@ const App = () => {
                   <Navigate to="/dashboard" replace />
                 ) : (
                   <Login onLogin={handleLogin} />
+                )
+              }
+            />
+            <Route
+              path="/login"
+              element={
+                user ? (
+                  <Navigate to="/dashboard" replace />
+                ) : (
+                  <Login onLogin={handleLogin} />
+                )
+              }
+            />
+            <Route
+              path="/signup"
+              element={
+                user ? (
+                  <Navigate to="/dashboard" replace />
+                ) : (
+                  <SignUp onSignUp={handleLogin} />
                 )
               }
             />
