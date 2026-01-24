@@ -30,7 +30,7 @@ import {
   Calendar,
   Filter,
 } from "lucide-react";
-import { Test, TestStatus } from "@/lib/types";
+import { Test, TestStatus, Question } from "@/lib/types";
 import { TestDialog } from "@/components/dialogs/TestDialog";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -40,6 +40,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { createTest, createQuestion } from "@/lib/firestore";
 
 import { mockTests } from "@/lib/mock-data";
 
@@ -74,43 +75,82 @@ export default function TestsManagement() {
     setDialogOpen(true);
   };
 
-  const handleSaveTest = (testData: Partial<Test>) => {
+  const handleSaveTest = async (testData: Partial<Test>, questions: Partial<Question>[]) => {
     console.log('Save Test called with data:', testData);
-    if (editingTest) {
-      setTests(
-        tests.map((t) =>
-          t.id === editingTest.id ? { ...t, ...testData } : t
-        )
-      );
+    console.log('Questions:', questions);
+    
+    try {
+      if (editingTest) {
+        // Update existing test
+        setTests(
+          tests.map((t) =>
+            t.id === editingTest.id ? { ...t, ...testData } : t
+          )
+        );
+        toast({
+          title: "Test Updated",
+          description: "Test has been updated successfully.",
+        });
+      } else {
+        // Create questions first and get their IDs
+        const questionIds: string[] = [];
+        for (const questionData of questions) {
+          const questionId = await createQuestion({
+            ...questionData,
+            subject: testData.course || "",
+            topic: "",
+            chapter: "",
+            difficulty: "Medium",
+            createdBy: "current-teacher-id", // TODO: Get from auth context
+            status: "approved",
+          });
+          questionIds.push(questionId);
+        }
+
+        // Create the test with question IDs
+        const testId = await createTest({
+          ...testData,
+          questions: questionIds,
+          status: "scheduled",
+          createdBy: "current-teacher-id", // TODO: Get from auth context
+          allowedStudents: ["all"],
+          attemptedBy: [],
+        });
+
+        // Add to local state for display
+        const newTest: Test = {
+          id: testId,
+          name: testData.name || "",
+          description: testData.description || "",
+          type: testData.type || "Mock Test",
+          course: testData.course || "",
+          duration: testData.duration || 180,
+          totalMarks: testData.totalMarks || 300,
+          scheduledDate: testData.scheduledDate || "",
+          startTime: testData.startTime || "",
+          questions: questionIds,
+          status: "scheduled",
+          createdBy: "current-teacher-id",
+          createdAt: new Date().toISOString(),
+          allowedStudents: ["all"],
+          attemptedBy: [],
+          instructions: testData.instructions || "",
+          passMarks: testData.passMarks || 100,
+        };
+        
+        console.log('New test created:', newTest);
+        setTests([...tests, newTest]);
+        toast({
+          title: "Test Created",
+          description: `New test created with ${questions.length} questions.`,
+        });
+      }
+    } catch (error) {
+      console.error('Error saving test:', error);
       toast({
-        title: "Test Updated",
-        description: "Test has been updated successfully.",
-      });
-    } else {
-      const newTest: Test = {
-        id: `TEST${(tests.length + 1).toString().padStart(3, "0")}`,
-        name: testData.name || "",
-        description: testData.description || "",
-        type: testData.type || "Mock Test",
-        course: testData.course || "",
-        duration: testData.duration || 180,
-        totalMarks: testData.totalMarks || 300,
-        scheduledDate: testData.scheduledDate || "",
-        startTime: testData.startTime || "",
-        questions: [],
-        status: "scheduled",
-        createdBy: "T001",
-        createdAt: new Date().toISOString(),
-        allowedStudents: ["all"],
-        attemptedBy: [],
-        instructions: testData.instructions || "",
-        passMarks: testData.passMarks || 100,
-      };
-      console.log('New test created:', newTest);
-      setTests([...tests, newTest]);
-      toast({
-        title: "Test Created",
-        description: "New test has been created successfully.",
+        title: "Error",
+        description: "Failed to save test. Please try again.",
+        variant: "destructive",
       });
     }
   };
