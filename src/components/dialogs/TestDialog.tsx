@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -34,20 +34,40 @@ export function TestDialog({
   test,
   onSave,
 }: TestDialogProps) {
-  const [formData, setFormData] = useState<Partial<Test>>(
-    test || {
-      name: "",
-      description: "",
-      type: "Mock Test",
-      course: "",
-      duration: 180,
-      totalMarks: 300,
-      scheduledDate: "",
-      startTime: "",
-      instructions: "",
-      passMarks: 100,
+  const [formData, setFormData] = useState<Partial<Test>>({
+    name: "",
+    description: "",
+    type: "Mock Test",
+    course: "",
+    duration: 180,
+    totalMarks: 300,
+    scheduledDate: "",
+    startTime: "",
+    instructions: "",
+    passMarks: 100,
+  });
+
+  // Reset form when dialog opens or test changes
+  useEffect(() => {
+    if (open) {
+      if (test) {
+        setFormData(test);
+      } else {
+        setFormData({
+          name: "",
+          description: "",
+          type: "Mock Test",
+          course: "",
+          duration: 180,
+          totalMarks: 300,
+          scheduledDate: "",
+          startTime: "",
+          instructions: "",
+          passMarks: 100,
+        });
+      }
     }
-  );
+  }, [open, test]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
