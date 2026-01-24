@@ -61,9 +61,10 @@ export default function TestsManagement() {
 
   const handleAddTest = () => {
     console.log('Add Test clicked');
+    alert('Button was clicked! Dialog should open now.');
     setEditingTest(undefined);
     setDialogOpen(true);
-    console.log('Dialog should open now');
+    console.log('Dialog should open now, dialogOpen state set to true');
   };
 
   const handleEditTest = (test: Test) => {
@@ -162,7 +163,10 @@ export default function TestsManagement() {
           variant="accent"
           size="default"
           className="rounded-xl"
-          onClick={handleAddTest}
+          onClick={() => {
+            console.log('Button clicked!');
+            handleAddTest();
+          }}
         >
           <Plus className="h-4 w-4 mr-2" />
           Create New Test
@@ -340,12 +344,13 @@ export default function TestsManagement() {
               </TableBody>
             </Table>
           </div>
-        </CardContent>
-      </Card>
-
+      {console.log('TestDialog render, dialogOpen:', dialogOpen)}
       <TestDialog
         open={dialogOpen}
-        onOpenChange={setDialogOpen}
+        onOpenChange={(open) => {
+          console.log('Dialog onOpenChange called with:', open);
+          setDialogOpen(open);
+        }}
         test={editingTest}
         onSave={handleSaveTest}
       />
