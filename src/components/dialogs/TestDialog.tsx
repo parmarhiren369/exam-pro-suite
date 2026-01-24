@@ -27,6 +27,8 @@ interface TestDialogProps {
   onOpenChange: (open: boolean) => void;
   test?: Test;
   onSave: (test: Partial<Test>, questions: Partial<Question>[]) => void;
+  initialQuestions?: Partial<Question>[];
+  initialMetadata?: any;
 }
 
 export function TestDialog({
@@ -34,6 +36,8 @@ export function TestDialog({
   onOpenChange,
   test,
   onSave,
+  initialQuestions,
+  initialMetadata,
 }: TestDialogProps) {
   const [formData, setFormData] = useState<Partial<Test>>({
     name: "",
@@ -65,7 +69,7 @@ export function TestDialog({
 
   // Reset form when dialog opens or data changes
   useEffect(() => {
-    console.log('Dialog useEffect - open:', open);
+    console.log('Dialog useEffect - open:', open, 'initialQuestions:', initialQuestions?.length);
     
     if (!open) return;
     
@@ -88,7 +92,27 @@ export function TestDialog({
       return;
     }
     
-    // Priority 2: New empty test
+    // Priority 2: Imported questions from PDF
+    if (initialQuestions && initialQuestions.length > 0) {
+      console.log('Setting imported questions:', initialQuestions.length);
+      const totalMarks = initialQuestions.reduce((sum, q) => sum + (q.marks || 0), 0);
+      setFormData({
+        name: initialMetadata?.examName || "",
+        description: initialMetadata?.subject || "",
+        type: "Mock Test",
+        course: "",
+        duration: initialMetadata?.duration || 180,
+        totalMarks: initialMetadata?.totalMarks || totalMarks,
+        scheduledDate: "",
+        startTime: "",
+        instructions: "",
+        passMarks: Math.round((initialMetadata?.totalMarks || totalMarks) * 0.33),
+      });
+      setQuestions([...initialQuestions]);
+      return;
+    }
+    
+    // Priority 3: New empty test
     setFormData({
       name: "",
       description: "",
@@ -103,7 +127,7 @@ export function TestDialog({
     });
     setQuestions([]);
     
-  }, [open, test]);
+  }, [open, test, initialQuestions, initialMetadata]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

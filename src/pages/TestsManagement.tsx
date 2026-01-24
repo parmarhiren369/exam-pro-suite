@@ -29,9 +29,11 @@ import {
   FileText,
   Calendar,
   Filter,
+  FileUp,
 } from "lucide-react";
 import { Test, TestStatus, Question } from "@/lib/types";
 import { TestDialog } from "@/components/dialogs/TestDialog";
+import { PDFUploadDialog } from "@/components/dialogs/PDFUploadDialog";
 import { useToast } from "@/hooks/use-toast";
 import {
   Select,
@@ -51,7 +53,18 @@ export default function TestsManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [pdfDialogOpen, setPdfDialogOpen] = useState(false);
   const [editingTest, setEditingTest] = useState<Test | undefined>();
+  const [importedQuestions, setImportedQuestions] = useState<Partial<Question>[] | undefined>();
+  const [importedMetadata, setImportedMetadata] = useState<any | undefined>();
+
+  const handleQuestionsExtracted = (questions: Partial<Question>[], metadata: any) => {
+    setImportedQuestions(questions);
+    setImportedMetadata(metadata);
+    setEditingTest(undefined);
+    setPdfDialogOpen(false);
+    setDialogOpen(true);
+  };
 
   const filteredTests = tests.filter((test) => {
     const matchesSearch = test.name
@@ -225,6 +238,15 @@ export default function TestsManagement() {
           </p>
         </div>
         <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="default"
+            className="rounded-xl"
+            onClick={() => setPdfDialogOpen(true)}
+          >
+            <FileUp className="h-4 w-4 mr-2" />
+            Upload PDF
+          </Button>
           <Button
             variant="accent"
             size="default"
@@ -420,9 +442,22 @@ export default function TestsManagement() {
         onOpenChange={(open) => {
           console.log('Dialog onOpenChange called with:', open);
           setDialogOpen(open);
+          // Clear imported data when dialog closes
+          if (!open) {
+            setImportedQuestions(undefined);
+            setImportedMetadata(undefined);
+          }
         }}
         test={editingTest}
         onSave={handleSaveTest}
+        initialQuestions={importedQuestions}
+        initialMetadata={importedMetadata}
+      />
+
+      <PDFUploadDialog
+        open={pdfDialogOpen}
+        onOpenChange={setPdfDialogOpen}
+        onQuestionsExtracted={handleQuestionsExtracted}
       />
     </div>
   );
