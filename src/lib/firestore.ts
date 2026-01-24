@@ -24,7 +24,7 @@ export const createDocument = async (collectionName: string, data: any) => {
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now(),
     });
-    return { id: docRef.id, ...data };
+    return docRef.id;
   } catch (error) {
     console.error('Error creating document:', error);
     throw error;
