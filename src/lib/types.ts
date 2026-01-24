@@ -79,6 +79,8 @@ export interface Question {
   createdAt: string;
   status: QuestionStatus;
   tags?: string[];
+  imageUrl?: string; // Base64 or URL for question image/diagram
+  imageDescription?: string; // Alt text or description of the image
 }
 
 export type TestStatus = "draft" | "scheduled" | "ongoing" | "completed" | "cancelled";

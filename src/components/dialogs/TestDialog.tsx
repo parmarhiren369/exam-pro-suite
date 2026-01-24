@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -19,14 +19,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Image as ImageIcon, Upload, X } from "lucide-react";
 import { Test, TestType, Question, QuestionType } from "@/lib/types";
+import { ExtractionMetadata } from "@/lib/openai";
 
 interface TestDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   test?: Test;
   onSave: (test: Partial<Test>, questions: Partial<Question>[]) => void;
+  initialQuestions?: Partial<Question>[];
+  initialMetadata?: ExtractionMetadata;
 }
 
 export function TestDialog({
@@ -34,6 +37,8 @@ export function TestDialog({
   onOpenChange,
   test,
   onSave,
+  initialQuestions,
+  initialMetadata,
 }: TestDialogProps) {
   const [formData, setFormData] = useState<Partial<Test>>({
     name: "",
@@ -57,43 +62,73 @@ export function TestDialog({
     options: ["", "", "", ""],
     correctAnswer: "",
     solution: "",
+    imageUrl: "",
   });
+  
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const questionImageInputRef = useRef<HTMLInputElement>(null);
 
-  // Reset form when dialog opens or test changes
+  // Reset form when dialog opens or data changes
   useEffect(() => {
-    console.log('Dialog open state changed:', open);
-    if (open) {
-      if (test) {
-        setFormData(test);
-        // Note: For editing, we would need to fetch the actual questions by IDs
-        setQuestions([]);
-      } else {
-        setFormData({
-          name: "",
-          description: "",
-          type: "Mock Test",
-          course: "",
-          duration: 180,
-          totalMarks: 300,
-          scheduledDate: "",
-          startTime: "",
-          instructions: "",
-          passMarks: 100,
-        });
-        setQuestions([]);
-      }
-      // Reset current question form
-      setCurrentQuestion({
-        text: "",
-        type: "MCQ",
-        marks: 4,
-        negativeMarks: 1,
-        options: ["", "", "", ""],
-        correctAnswer: "",
-        solution: "",
-      });
+    console.log('Dialog useEffect - open:', open, 'initialQuestions:', initialQuestions?.length);
+    
+    if (!open) return;
+    
+    // Reset current question form
+    setCurrentQuestion({
+      text: "",
+      type: "MCQ",
+      marks: 4,
+      negativeMarks: 1,
+      options: ["", "", "", ""],
+      correctAnswer: "",
+      solution: "",
+      imageUrl: "",
+    });
+    
+    // Priority 1: Editing existing test
+    if (test) {
+      setFormData(test);
+      setQuestions([]);
+      return;
     }
-  }, [open, test]);
+    
+    // Priority 2: Imported questions from AI
+    if (initialQuestions && initialQuestions.length > 0) {
+      console.log('Setting imported questions:', initialQuestions.length);
+      const totalMarks = initialQuestions.reduce((sum, q) => sum + (q.marks || 0), 0);
+      setFormData({
+        name: initialMetadata?.examName || "",
+        description: initialMetadata?.subject || "",
+        type: "Mock Test",
+        course: "",
+        duration: initialMetadata?.duration || 180,
+        totalMarks: initialMetadata?.totalMarks || totalMarks,
+        scheduledDate: "",
+        startTime: "",
+        instructions: "",
+        passMarks: Math.round((initialMetadata?.totalMarks || totalMarks) * 0.33),
+      });
+      setQuestions([...initialQuestions]); // Spread to create new array
+      return;
+    }
+    
+    // Priority 3: New empty test
+    setFormData({
+      name: "",
+      description: "",
+      type: "Mock Test",
+      course: "",
+      duration: 180,
+      totalMarks: 300,
+      scheduledDate: "",
+      startTime: "",
+      instructions: "",
+      passMarks: 100,
+    });
+    setQuestions([]);
+    
+  }, [open, test, initialQuestions, initialMetadata]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -133,6 +168,7 @@ export function TestDialog({
       options: ["", "", "", ""],
       correctAnswer: "",
       solution: "",
+      imageUrl: "",
     });
   };
 
@@ -144,6 +180,53 @@ export function TestDialog({
     const newOptions = [...(currentQuestion.options || ["", "", "", ""])];
     newOptions[index] = value;
     setCurrentQuestion({ ...currentQuestion, options: newOptions });
+  };
+
+  // Handle image upload for current question being added
+  const handleCurrentQuestionImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    if (!file.type.startsWith('image/')) {
+      alert('Please upload an image file (JPG, PNG, GIF, etc.)');
+      return;
+    }
+    
+    // Convert to base64
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result as string;
+      setCurrentQuestion({ ...currentQuestion, imageUrl: base64 });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Handle image upload for existing questions in the list
+  const handleQuestionImageUpload = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    if (!file.type.startsWith('image/')) {
+      alert('Please upload an image file (JPG, PNG, GIF, etc.)');
+      return;
+    }
+    
+    // Convert to base64
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result as string;
+      const updatedQuestions = [...questions];
+      updatedQuestions[index] = { ...updatedQuestions[index], imageUrl: base64 };
+      setQuestions(updatedQuestions);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Remove image from existing question
+  const handleRemoveQuestionImage = (index: number) => {
+    const updatedQuestions = [...questions];
+    updatedQuestions[index] = { ...updatedQuestions[index], imageUrl: undefined };
+    setQuestions(updatedQuestions);
   };
 
   const testTypes: TestType[] = [
@@ -337,17 +420,57 @@ export function TestDialog({
 
               {/* Added Questions List */}
               {questions.length > 0 && (
-                <div className="space-y-2 max-h-48 overflow-y-auto">
+                <div className="space-y-2 max-h-64 overflow-y-auto">
                   {questions.map((q, index) => (
                     <Card key={index} className="relative">
                       <CardHeader className="p-3 pb-2">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <p className="text-sm font-medium">Q{index + 1}. {q.text}</p>
-                            <div className="flex gap-2 mt-1 text-xs text-muted-foreground">
+                        <div className="flex items-start justify-between gap-2">
+                          {/* Question Image Thumbnail */}
+                          {q.imageUrl ? (
+                            <div className="shrink-0 w-20 h-20 rounded overflow-hidden border relative group">
+                              <img 
+                                src={q.imageUrl} 
+                                alt={`Question ${index + 1} diagram`}
+                                className="w-full h-full object-cover"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveQuestionImage(index)}
+                                className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="shrink-0">
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => handleQuestionImageUpload(index, e)}
+                                className="hidden"
+                                id={`image-upload-${index}`}
+                              />
+                              <label
+                                htmlFor={`image-upload-${index}`}
+                                className="flex flex-col items-center justify-center w-20 h-20 border-2 border-dashed rounded cursor-pointer hover:border-accent hover:bg-accent/5 transition-colors"
+                              >
+                                <ImageIcon className="h-5 w-5 text-muted-foreground mb-1" />
+                                <span className="text-[10px] text-muted-foreground text-center">Add Image</span>
+                              </label>
+                            </div>
+                          )}
+                          
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium line-clamp-2">Q{index + 1}. {q.text}</p>
+                            <div className="flex flex-wrap gap-2 mt-1 text-xs text-muted-foreground">
                               <span className="px-2 py-0.5 bg-primary/10 rounded">{q.type}</span>
                               <span>{q.marks} marks</span>
                               {q.negativeMarks && <span>-{q.negativeMarks} negative</span>}
+                              {q.correctAnswer && (
+                                <span className="px-2 py-0.5 bg-success/10 text-success rounded">
+                                  Ans: {typeof q.correctAnswer === 'string' ? q.correctAnswer : JSON.stringify(q.correctAnswer)}
+                                </span>
+                              )}
                             </div>
                           </div>
                           <Button
@@ -355,7 +478,7 @@ export function TestDialog({
                             variant="ghost"
                             size="sm"
                             onClick={() => handleRemoveQuestion(index)}
-                            className="h-8 w-8 p-0"
+                            className="h-8 w-8 p-0 shrink-0"
                           >
                             <Trash2 className="h-4 w-4 text-destructive" />
                           </Button>
@@ -383,6 +506,53 @@ export function TestDialog({
                       placeholder="Enter the question..."
                       rows={2}
                     />
+                  </div>
+
+                  {/* Image Upload for New Question */}
+                  <div className="space-y-2">
+                    <Label>Question Image (Optional)</Label>
+                    {currentQuestion.imageUrl ? (
+                      <div className="flex items-start gap-3">
+                        <div className="relative w-24 h-24 rounded overflow-hidden border">
+                          <img 
+                            src={currentQuestion.imageUrl} 
+                            alt="Question diagram"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setCurrentQuestion({ ...currentQuestion, imageUrl: "" })}
+                        >
+                          <X className="h-4 w-4 mr-1" />
+                          Remove
+                        </Button>
+                      </div>
+                    ) : (
+                      <div>
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/*"
+                          onChange={handleCurrentQuestionImageUpload}
+                          className="hidden"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => fileInputRef.current?.click()}
+                        >
+                          <Upload className="h-4 w-4 mr-2" />
+                          Upload Image/Diagram
+                        </Button>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Add diagrams, figures, or images for this question
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-3 gap-3">
