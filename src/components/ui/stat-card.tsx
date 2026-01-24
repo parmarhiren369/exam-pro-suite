@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { LucideIcon } from "lucide-react";
+import { TrendingUp, TrendingDown } from "lucide-react";
 
 interface StatCardProps {
   title: string;
@@ -12,23 +13,8 @@ interface StatCardProps {
   };
   variant?: "default" | "primary" | "accent" | "success" | "warning";
   className?: string;
+  delay?: number;
 }
-
-const variantStyles = {
-  default: "bg-card border border-border",
-  primary: "gradient-primary text-primary-foreground",
-  accent: "gradient-accent text-accent-foreground",
-  success: "gradient-success text-success-foreground",
-  warning: "bg-warning text-warning-foreground",
-};
-
-const iconVariantStyles = {
-  default: "bg-muted text-muted-foreground",
-  primary: "bg-primary-foreground/20 text-primary-foreground",
-  accent: "bg-accent-foreground/20 text-accent-foreground",
-  success: "bg-success-foreground/20 text-success-foreground",
-  warning: "bg-warning-foreground/20 text-warning-foreground",
-};
 
 export function StatCard({
   title,
@@ -38,61 +24,85 @@ export function StatCard({
   trend,
   variant = "default",
   className,
+  delay = 0,
 }: StatCardProps) {
+  const variants = {
+    default: {
+      card: "bg-card border border-border/50 hover:border-border",
+      icon: "icon-container-primary",
+      title: "text-muted-foreground",
+      value: "text-foreground",
+      trend: trend?.isPositive ? "text-success" : "text-destructive",
+    },
+    primary: {
+      card: "card-gradient-primary border-0",
+      icon: "bg-white/20 backdrop-blur-sm",
+      title: "text-primary-foreground/70",
+      value: "text-primary-foreground",
+      trend: "text-primary-foreground/90",
+    },
+    accent: {
+      card: "card-gradient-accent border-0",
+      icon: "bg-white/20 backdrop-blur-sm",
+      title: "text-accent-foreground/70",
+      value: "text-accent-foreground",
+      trend: "text-accent-foreground/90",
+    },
+    success: {
+      card: "card-gradient-success border-0",
+      icon: "bg-white/20 backdrop-blur-sm",
+      title: "text-success-foreground/70",
+      value: "text-success-foreground",
+      trend: "text-success-foreground/90",
+    },
+    warning: {
+      card: "bg-warning border-0",
+      icon: "bg-white/20 backdrop-blur-sm",
+      title: "text-warning-foreground/70",
+      value: "text-warning-foreground",
+      trend: "text-warning-foreground/90",
+    },
+  };
+
+  const styles = variants[variant];
+
   return (
     <div
       className={cn(
-        "rounded-xl p-6 shadow-card transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1",
-        variantStyles[variant],
+        "rounded-2xl p-6 shadow-premium transition-all duration-300 hover-lift opacity-0 animate-fade-in-up",
+        styles.card,
         className
       )}
+      style={{ animationDelay: `${delay}ms`, animationFillMode: "forwards" }}
     >
       <div className="flex items-start justify-between">
-        <div className="space-y-2">
-          <p
-            className={cn(
-              "text-sm font-medium",
-              variant === "default" ? "text-muted-foreground" : "opacity-80"
-            )}
-          >
+        <div className="space-y-3">
+          <p className={cn("text-sm font-medium", styles.title)}>
             {title}
           </p>
-          <p className="text-3xl font-bold tracking-tight">{value}</p>
+          <p className={cn("stat-value", styles.value)}>{value}</p>
           {description && (
-            <p
-              className={cn(
-                "text-sm",
-                variant === "default" ? "text-muted-foreground" : "opacity-70"
-              )}
-            >
+            <p className={cn("text-sm", styles.title)}>
               {description}
             </p>
           )}
           {trend && (
-            <div className="flex items-center gap-1 text-sm">
-              <span
-                className={cn(
-                  "font-medium",
-                  trend.isPositive ? "text-success" : "text-destructive",
-                  variant !== "default" && "opacity-90"
-                )}
-              >
+            <div className={cn("flex items-center gap-1.5 text-sm font-medium", styles.trend)}>
+              {trend.isPositive ? (
+                <TrendingUp className="h-4 w-4" />
+              ) : (
+                <TrendingDown className="h-4 w-4" />
+              )}
+              <span>
                 {trend.isPositive ? "+" : ""}
                 {trend.value}%
               </span>
-              <span className={variant === "default" ? "text-muted-foreground" : "opacity-70"}>
-                vs last month
-              </span>
+              <span className="opacity-70 font-normal">vs last month</span>
             </div>
           )}
         </div>
-        <div
-          className={cn(
-            "rounded-xl p-3",
-            iconVariantStyles[variant]
-          )}
-        >
-          <Icon className="h-6 w-6" />
+        <div className={cn("icon-container", styles.icon)}>
+          <Icon className="h-6 w-6 text-white" />
         </div>
       </div>
     </div>

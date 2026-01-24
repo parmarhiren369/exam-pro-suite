@@ -14,7 +14,10 @@ import {
   BookOpen,
   Target,
   TrendingUp,
+  TrendingDown,
   Upload,
+  Sparkles,
+  Lightbulb,
 } from "lucide-react";
 import {
   Card,
@@ -48,46 +51,52 @@ export default function TeacherDashboard() {
     { topic: "Modern Physics", avgScore: 74, students: 290, trend: "up" },
   ];
 
-  const getStatusIcon = (status: string) => {
+  const getStatusConfig = (status: string) => {
     switch (status) {
       case "approved":
-        return <CheckCircle2 className="h-4 w-4 text-success" />;
+        return { icon: CheckCircle2, color: "text-success", bg: "bg-success/10" };
       case "pending":
-        return <AlertCircle className="h-4 w-4 text-warning" />;
+        return { icon: AlertCircle, color: "text-warning", bg: "bg-warning/10" };
       case "rejected":
-        return <XCircle className="h-4 w-4 text-destructive" />;
+        return { icon: XCircle, color: "text-destructive", bg: "bg-destructive/10" };
       default:
-        return null;
+        return { icon: AlertCircle, color: "text-muted-foreground", bg: "bg-muted" };
     }
   };
 
-  const getDifficultyColor = (difficulty: string) => {
+  const getDifficultyConfig = (difficulty: string) => {
     switch (difficulty) {
       case "Easy":
-        return "bg-success/10 text-success";
+        return "bg-success/10 text-success border-success/20";
       case "Medium":
-        return "bg-warning/10 text-warning";
+        return "bg-warning/10 text-warning border-warning/20";
       case "Hard":
-        return "bg-destructive/10 text-destructive";
+        return "bg-destructive/10 text-destructive border-destructive/20";
       default:
         return "";
     }
   };
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-fade-in-up">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Faculty Dashboard</h1>
-          <p className="text-muted-foreground mt-1">Manage questions, tests & track student performance</p>
+          <div className="flex items-center gap-2 mb-2">
+            <div className="px-3 py-1 rounded-full bg-success/10 text-success text-sm font-medium flex items-center gap-1.5">
+              <Sparkles className="h-3.5 w-3.5" />
+              Faculty Dashboard
+            </div>
+          </div>
+          <h1 className="text-3xl font-bold text-foreground">Welcome back, Teacher!</h1>
+          <p className="text-muted-foreground mt-1">Manage your questions, tests, and track student performance.</p>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline" size="default">
+          <Button variant="outline" size="default" className="rounded-xl border-2">
             <Upload className="h-4 w-4 mr-2" />
             Upload Solutions
           </Button>
-          <Button variant="accent" size="default">
+          <Button variant="accent" size="default" className="rounded-xl shadow-glow-accent/30">
             <Plus className="h-4 w-4 mr-2" />
             Create Test
           </Button>
@@ -95,13 +104,14 @@ export default function TeacherDashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         <StatCard
           title="Questions Created"
           value="847"
           description="Total in question bank"
           icon={PenTool}
           trend={{ value: 15, isPositive: true }}
+          delay={0}
         />
         <StatCard
           title="Tests Created"
@@ -110,12 +120,14 @@ export default function TeacherDashboard() {
           icon={FileText}
           trend={{ value: 8, isPositive: true }}
           variant="accent"
+          delay={100}
         />
         <StatCard
           title="Students Assigned"
           value="520"
           description="Across 6 batches"
           icon={Users}
+          delay={200}
         />
         <StatCard
           title="Avg. Performance"
@@ -124,36 +136,39 @@ export default function TeacherDashboard() {
           icon={BarChart3}
           trend={{ value: 3, isPositive: true }}
           variant="success"
+          delay={300}
         />
       </div>
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Question Bank Activity */}
-        <Card className="lg:col-span-2 shadow-card">
-          <CardHeader className="flex flex-row items-center justify-between">
+        <Card className="lg:col-span-2 shadow-premium hover-lift border-border/50 opacity-0 animate-fade-in-up" style={{ animationDelay: "400ms", animationFillMode: "forwards" }}>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
             <div>
-              <CardTitle className="text-lg">Recent Questions</CardTitle>
+              <CardTitle className="text-xl font-bold">Recent Questions</CardTitle>
               <CardDescription>Your latest question submissions</CardDescription>
             </div>
-            <Button variant="ghost" size="sm" className="text-accent">
+            <Button variant="ghost" size="sm" className="text-accent hover:text-accent/80 font-medium">
               <Plus className="h-4 w-4 mr-1" /> Add Question
             </Button>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {recentQuestions.map((question) => (
+          <CardContent className="space-y-3">
+            {recentQuestions.map((question, index) => {
+              const statusConfig = getStatusConfig(question.status);
+              const StatusIcon = statusConfig.icon;
+              return (
                 <div
                   key={question.id}
-                  className="flex items-center justify-between p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                  className="flex items-center justify-between p-4 rounded-xl bg-muted/30 hover:bg-muted/50 transition-all border border-transparent hover:border-border/50 group cursor-pointer"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <BookOpen className="h-5 w-5 text-primary" />
+                    <div className="w-12 h-12 rounded-xl icon-container-primary flex items-center justify-center">
+                      <Lightbulb className="h-5 w-5 text-white" />
                     </div>
                     <div>
-                      <p className="font-medium text-foreground">{question.topic}</p>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <p className="font-semibold text-foreground group-hover:text-accent transition-colors">{question.topic}</p>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground mt-0.5">
                         <span>{question.chapter}</span>
                         <span>•</span>
                         <span>{question.type}</span>
@@ -161,62 +176,64 @@ export default function TeacherDashboard() {
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <Badge variant="outline" className={getDifficultyColor(question.difficulty)}>
+                    <Badge variant="outline" className={getDifficultyConfig(question.difficulty)}>
                       {question.difficulty}
                     </Badge>
-                    {getStatusIcon(question.status)}
+                    <div className={`w-8 h-8 rounded-lg ${statusConfig.bg} flex items-center justify-center`}>
+                      <StatusIcon className={`h-4 w-4 ${statusConfig.color}`} />
+                    </div>
                   </div>
                 </div>
-              ))}
-            </div>
+              );
+            })}
           </CardContent>
         </Card>
 
         {/* Upcoming Tests */}
-        <Card className="shadow-card">
-          <CardHeader className="flex flex-row items-center justify-between">
+        <Card className="shadow-premium hover-lift border-border/50 opacity-0 animate-fade-in-up" style={{ animationDelay: "450ms", animationFillMode: "forwards" }}>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
             <div>
-              <CardTitle className="text-lg">Upcoming Tests</CardTitle>
+              <CardTitle className="text-xl font-bold">Upcoming Tests</CardTitle>
               <CardDescription>Scheduled exams</CardDescription>
             </div>
-            <Clock className="h-5 w-5 text-accent" />
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {upcomingTests.map((test) => (
-                <div
-                  key={test.id}
-                  className="p-4 rounded-lg border border-border hover:border-accent/50 transition-colors cursor-pointer"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-medium text-foreground">{test.name}</h4>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                  <div className="space-y-1 text-sm text-muted-foreground">
-                    <p className="flex items-center gap-2">
-                      <Clock className="h-3 w-3" />
-                      {test.date}
-                    </p>
-                    <p className="flex items-center gap-2">
-                      <Users className="h-3 w-3" />
-                      {test.students} students • {test.duration}
-                    </p>
-                  </div>
-                </div>
-              ))}
+            <div className="w-10 h-10 rounded-xl icon-container-accent flex items-center justify-center">
+              <Clock className="h-5 w-5 text-white" />
             </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {upcomingTests.map((test) => (
+              <div
+                key={test.id}
+                className="p-4 rounded-xl border-2 border-border/50 hover:border-accent/30 transition-all cursor-pointer group"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="font-semibold text-foreground group-hover:text-accent transition-colors">{test.name}</h4>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                </div>
+                <div className="space-y-2 text-sm text-muted-foreground">
+                  <p className="flex items-center gap-2">
+                    <Clock className="h-3.5 w-3.5" />
+                    {test.date}
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <Users className="h-3.5 w-3.5" />
+                    {test.students} students • {test.duration}
+                  </p>
+                </div>
+              </div>
+            ))}
           </CardContent>
         </Card>
       </div>
 
       {/* Topic-wise Performance Analysis */}
-      <Card className="shadow-card">
+      <Card className="shadow-premium hover-lift border-border/50 opacity-0 animate-fade-in-up" style={{ animationDelay: "500ms", animationFillMode: "forwards" }}>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle className="text-lg">Topic-wise Performance Analysis</CardTitle>
-            <CardDescription>Student performance by topic</CardDescription>
+            <CardTitle className="text-xl font-bold">Topic-wise Performance Analysis</CardTitle>
+            <CardDescription>Student performance breakdown by topic</CardDescription>
           </div>
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" className="rounded-xl border-2">
             <BarChart3 className="h-4 w-4 mr-2" />
             Full Report
           </Button>
@@ -224,25 +241,33 @@ export default function TeacherDashboard() {
         <CardContent>
           <div className="space-y-6">
             {topicPerformance.map((topic) => (
-              <div key={topic.topic} className="space-y-2">
+              <div key={topic.topic} className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <Target className="h-4 w-4 text-muted-foreground" />
-                    <span className="font-medium text-foreground">{topic.topic}</span>
+                    <span className="font-semibold text-foreground">{topic.topic}</span>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-4">
                     <span className="text-sm text-muted-foreground">{topic.students} students</span>
-                    <span className={`font-semibold ${topic.avgScore >= 75 ? "text-success" : topic.avgScore >= 60 ? "text-warning" : "text-destructive"}`}>
-                      {topic.avgScore}%
-                    </span>
-                    {topic.trend === "up" && <TrendingUp className="h-4 w-4 text-success" />}
-                    {topic.trend === "down" && <TrendingUp className="h-4 w-4 text-destructive rotate-180" />}
+                    <div className="flex items-center gap-2">
+                      <span className={`font-bold ${topic.avgScore >= 75 ? "text-success" : topic.avgScore >= 60 ? "text-warning" : "text-destructive"}`}>
+                        {topic.avgScore}%
+                      </span>
+                      {topic.trend === "up" && <TrendingUp className="h-4 w-4 text-success" />}
+                      {topic.trend === "down" && <TrendingDown className="h-4 w-4 text-destructive" />}
+                    </div>
                   </div>
                 </div>
-                <Progress 
-                  value={topic.avgScore} 
-                  className="h-2"
-                />
+                <div className="relative h-3 rounded-full bg-muted overflow-hidden">
+                  <div 
+                    className={`absolute inset-y-0 left-0 rounded-full transition-all duration-1000 ease-out ${
+                      topic.avgScore >= 75 ? "bg-gradient-to-r from-success to-success/70" : 
+                      topic.avgScore >= 60 ? "bg-gradient-to-r from-warning to-warning/70" : 
+                      "bg-gradient-to-r from-destructive to-destructive/70"
+                    }`}
+                    style={{ width: `${topic.avgScore}%` }}
+                  />
+                </div>
               </div>
             ))}
           </div>
