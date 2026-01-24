@@ -48,6 +48,7 @@ export function TestDialog({
 
   // Reset form when dialog opens or test changes
   useEffect(() => {
+    console.log('Dialog open state changed:', open);
     if (open) {
       if (test) {
         setFormData(test);
@@ -70,6 +71,7 @@ export function TestDialog({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Form submitted with data:', formData);
     onSave(formData);
     onOpenChange(false);
   };
@@ -108,7 +110,7 @@ export function TestDialog({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">Description *</Label>
               <Textarea
                 id="description"
                 value={formData.description}
@@ -117,6 +119,7 @@ export function TestDialog({
                 }
                 placeholder="Brief description of the test"
                 rows={3}
+                required
               />
             </div>
 

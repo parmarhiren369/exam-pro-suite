@@ -60,8 +60,10 @@ export default function TestsManagement() {
   });
 
   const handleAddTest = () => {
+    console.log('Add Test clicked');
     setEditingTest(undefined);
     setDialogOpen(true);
+    console.log('Dialog should open now');
   };
 
   const handleEditTest = (test: Test) => {
@@ -70,6 +72,7 @@ export default function TestsManagement() {
   };
 
   const handleSaveTest = (testData: Partial<Test>) => {
+    console.log('Save Test called with data:', testData);
     if (editingTest) {
       setTests(
         tests.map((t) =>
@@ -83,17 +86,24 @@ export default function TestsManagement() {
     } else {
       const newTest: Test = {
         id: `TEST${(tests.length + 1).toString().padStart(3, "0")}`,
+        name: testData.name || "",
+        description: testData.description || "",
+        type: testData.type || "Mock Test",
+        course: testData.course || "",
+        duration: testData.duration || 180,
+        totalMarks: testData.totalMarks || 300,
+        scheduledDate: testData.scheduledDate || "",
+        startTime: testData.startTime || "",
         questions: [],
         status: "scheduled",
         createdBy: "T001",
         createdAt: new Date().toISOString(),
         allowedStudents: ["all"],
         attemptedBy: [],
-        ...(testData as Omit<
-          Test,
-          "id" | "questions" | "status" | "createdBy" | "createdAt"
-        >),
+        instructions: testData.instructions || "",
+        passMarks: testData.passMarks || 100,
       };
+      console.log('New test created:', newTest);
       setTests([...tests, newTest]);
       toast({
         title: "Test Created",
