@@ -116,13 +116,14 @@ const App = () => {
                 <Route
                   path="/tests"
                   element={
-                    <DashboardLayout
-                      role={user.role}
-                      userName={user.name}
-                      onLogout={handleLogout}
-                    >
-                      <Tests />
-                    </DashboardLayout>
+                      <DashboardLayout
+                        role={user.role}
+                        userName={user.name}
+                        onLogout={handleLogout}
+                      >
+                        <Tests userRole={user.role} />
+                      </DashboardLayout>
+
                   }
                 />
                 <Route

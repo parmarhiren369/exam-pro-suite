@@ -27,61 +27,37 @@ import {
   Filter,
   Plus,
   Calendar,
-  BookOpen,
-  Target,
   CheckCircle2,
   AlertCircle,
 } from "lucide-react";
+import { Test, TestStatus } from "@/lib/types";
+import { mockTests } from "@/lib/mock-data";
 
-interface Test {
-  id: number;
-  name: string;
-  course: string;
-  type: string;
-  duration: string;
-  questions: number;
-  totalMarks: number;
-  date: string;
-  time: string;
-  status: "upcoming" | "ongoing" | "completed";
-  students?: number;
-  avgScore?: number;
-}
-
-const testsData: Test[] = [
-  { id: 1, name: "JEE Main Mock Test 16", course: "JEE Main", type: "Full Syllabus", duration: "3 hours", questions: 90, totalMarks: 300, date: "Jan 25, 2025", time: "9:00 AM", status: "upcoming", students: 450 },
-  { id: 2, name: "NEET Biology Module", course: "NEET", type: "Chapter", duration: "1.5 hours", questions: 45, totalMarks: 180, date: "Jan 24, 2025", time: "2:00 PM", status: "ongoing", students: 320 },
-  { id: 3, name: "JEE Advanced Practice", course: "JEE Advanced", type: "Part Test", duration: "3 hours", questions: 54, totalMarks: 180, date: "Jan 22, 2025", time: "10:00 AM", status: "completed", students: 280, avgScore: 72 },
-  { id: 4, name: "Chemistry Full Test", course: "JEE Main", type: "Subject", duration: "1 hour", questions: 30, totalMarks: 100, date: "Jan 20, 2025", time: "3:00 PM", status: "completed", students: 410, avgScore: 68 },
-  { id: 5, name: "Physics Mechanics Test", course: "JEE Main", type: "Chapter", duration: "1.5 hours", questions: 35, totalMarks: 105, date: "Jan 18, 2025", time: "11:00 AM", status: "completed", students: 380, avgScore: 75 },
-  { id: 6, name: "NEET Full Mock", course: "NEET", type: "Full Syllabus", duration: "3 hours", questions: 180, totalMarks: 720, date: "Jan 28, 2025", time: "9:00 AM", status: "upcoming", students: 520 },
-];
-
-export default function Tests() {
+export default function Tests({ userRole }: { userRole?: string }) {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [courseFilter, setCourseFilter] = useState("all");
 
-  const getStatusConfig = (status: string) => {
+  const getStatusConfig = (status: TestStatus) => {
     switch (status) {
-      case "upcoming":
+      case "scheduled":
         return { color: "bg-info/10 text-info border-info/20", icon: Clock, label: "Upcoming" };
       case "ongoing":
         return { color: "bg-success/10 text-success border-success/20", icon: Play, label: "Live" };
       case "completed":
         return { color: "bg-muted text-muted-foreground border-muted", icon: CheckCircle2, label: "Completed" };
       default:
-        return { color: "", icon: AlertCircle, label: "" };
+        return { color: "", icon: AlertCircle, label: status };
     }
   };
 
-  const filteredTests = testsData.filter((test) => {
+  const filteredTests = mockTests.filter((test) => {
     const matchesSearch = test.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCourse = courseFilter === "all" || test.course === courseFilter;
+    const matchesCourse = courseFilter === "all" || test.course.includes(courseFilter);
     return matchesSearch && matchesCourse;
   });
 
-  const upcomingTests = filteredTests.filter((t) => t.status === "upcoming");
+  const upcomingTests = filteredTests.filter((t) => t.status === "scheduled");
   const ongoingTests = filteredTests.filter((t) => t.status === "ongoing");
   const completedTests = filteredTests.filter((t) => t.status === "completed");
 
@@ -105,7 +81,7 @@ export default function Tests() {
                 </div>
               </div>
             </div>
-            <Badge className={`${statusConfig.color} flex items-center gap-1`}>
+            <Badge className={`${statusConfig.color} flex items-center gap-1 uppercase text-[10px]`}>
               <StatusIcon className="h-3 w-3" />
               {statusConfig.label}
             </Badge>
@@ -113,7 +89,7 @@ export default function Tests() {
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-4 border-y border-border">
             <div className="text-center">
-              <p className="text-lg font-bold text-foreground">{test.questions}</p>
+              <p className="text-lg font-bold text-foreground">{test.questions.length}</p>
               <p className="text-xs text-muted-foreground">Questions</p>
             </div>
             <div className="text-center">
@@ -121,11 +97,11 @@ export default function Tests() {
               <p className="text-xs text-muted-foreground">Total Marks</p>
             </div>
             <div className="text-center">
-              <p className="text-lg font-bold text-foreground">{test.duration}</p>
+              <p className="text-lg font-bold text-foreground">{test.duration} min</p>
               <p className="text-xs text-muted-foreground">Duration</p>
             </div>
             <div className="text-center">
-              <p className="text-lg font-bold text-foreground">{test.students}</p>
+              <p className="text-lg font-bold text-foreground">{test.attemptedBy.length}</p>
               <p className="text-xs text-muted-foreground">Students</p>
             </div>
           </div>
@@ -133,12 +109,12 @@ export default function Tests() {
           <div className="flex items-center justify-between mt-4">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Calendar className="h-4 w-4" />
-              <span>{test.date}</span>
+              <span>{new Date(test.scheduledDate).toLocaleDateString()}</span>
               <span>•</span>
               <Clock className="h-4 w-4" />
-              <span>{test.time}</span>
+              <span>{test.startTime}</span>
             </div>
-            {test.status === "upcoming" && (
+            {test.status === "scheduled" && (
               <Button 
                 variant="accent" 
                 size="sm"
@@ -160,9 +136,6 @@ export default function Tests() {
             )}
             {test.status === "completed" && (
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-foreground">
-                  Avg: {test.avgScore}%
-                </span>
                 <Button variant="outline" size="sm">
                   View Results
                 </Button>
@@ -182,10 +155,12 @@ export default function Tests() {
           <h1 className="text-3xl font-bold text-foreground">Tests</h1>
           <p className="text-muted-foreground mt-1">Manage and track all examinations</p>
         </div>
-        <Button variant="accent">
-          <Plus className="h-4 w-4 mr-2" />
-          Create New Test
-        </Button>
+        {(userRole === "admin" || userRole === "teacher") && (
+          <Button variant="accent" onClick={() => navigate("/tests-management")}>
+            <Plus className="h-4 w-4 mr-2" />
+            Create New Test
+          </Button>
+        )}
       </div>
 
       {/* Filters */}

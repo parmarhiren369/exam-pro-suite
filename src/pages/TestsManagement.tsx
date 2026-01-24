@@ -41,10 +41,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+import { mockTests } from "@/lib/mock-data";
+
 export default function TestsManagement() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [tests, setTests] = useState<Test[]>([]);
+  const [tests, setTests] = useState<Test[]>(mockTests);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [dialogOpen, setDialogOpen] = useState(false);
