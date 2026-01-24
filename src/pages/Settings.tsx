@@ -37,8 +37,26 @@ import {
   Mail,
   Phone,
   Building2,
+  Trash2,
+  Upload,
+  AlertTriangle,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { mockTests } from "@/lib/mock-data";
+import { 
+  createTest, 
+  deleteDocument,
+  getTests,
+  getStudents,
+  getTeachers,
+  getCourses,
+  getBatches,
+  getQuestions,
+  getSubmissions,
+  getNotifications,
+} from "@/lib/firestore";
+import { db } from "@/lib/firebase";
+import { collection, getDocs } from "firebase/firestore";
 
 interface SettingsProps {
   userRole: "admin" | "teacher" | "student";
@@ -83,6 +101,10 @@ export default function Settings({
     maxStudentsPerBatch: 50,
   });
 
+  // Database management state
+  const [isAddingData, setIsAddingData] = useState(false);
+  const [isRemovingData, setIsRemovingData] = useState(false);
+
   // Appearance settings
   const [appearanceSettings, setAppearanceSettings] = useState({
     theme: "system",
@@ -125,6 +147,78 @@ export default function Settings({
     });
   };
 
+  // Add dummy data to Firebase
+  const handleAddDummyData = async () => {
+    setIsAddingData(true);
+    try {
+      // Add mock tests to Firebase
+      for (const test of mockTests) {
+        const { id, ...testData } = test;
+        await createTest(testData);
+      }
+
+      toast({
+        title: "Dummy Data Added",
+        description: `Successfully added ${mockTests.length} test(s) to the database.`,
+      });
+    } catch (error) {
+      console.error("Error adding dummy data:", error);
+      toast({
+        title: "Error",
+        description: "Failed to add dummy data. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAddingData(false);
+    }
+  };
+
+  // Remove all data from Firebase
+  const handleRemoveAllData = async () => {
+    if (!confirm("⚠️ WARNING: This will delete ALL data from the database. This action cannot be undone. Are you sure?")) {
+      return;
+    }
+
+    setIsRemovingData(true);
+    try {
+      const collections = [
+        'tests',
+        'students', 
+        'teachers',
+        'courses',
+        'batches',
+        'questions',
+        'submissions',
+        'notifications'
+      ];
+
+      let totalDeleted = 0;
+
+      for (const collectionName of collections) {
+        const snapshot = await getDocs(collection(db, collectionName));
+        const deletePromises = snapshot.docs.map(doc => 
+          deleteDocument(collectionName, doc.id)
+        );
+        await Promise.all(deletePromises);
+        totalDeleted += snapshot.docs.length;
+      }
+
+      toast({
+        title: "All Data Removed",
+        description: `Successfully deleted ${totalDeleted} document(s) from the database.`,
+      });
+    } catch (error) {
+      console.error("Error removing data:", error);
+      toast({
+        title: "Error",
+        description: "Failed to remove all data. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsRemovingData(false);
+    }
+  };
+
   return (
     <div className="space-y-8 animate-fade-in">
       {/* Header */}
@@ -157,10 +251,16 @@ export default function Settings({
             Appearance
           </TabsTrigger>
           {userRole === "admin" && (
-            <TabsTrigger value="institute">
-              <Building2 className="h-4 w-4 mr-2" />
-              Institute
-            </TabsTrigger>
+            <>
+              <TabsTrigger value="institute">
+                <Building2 className="h-4 w-4 mr-2" />
+                Institute
+              </TabsTrigger>
+              <TabsTrigger value="database">
+                <Database className="h-4 w-4 mr-2" />
+                Database
+              </TabsTrigger>
+            </>
           )}
         </TabsList>
 
@@ -659,6 +759,98 @@ export default function Settings({
                     <Save className="h-4 w-4 mr-2" />
                     Save Settings
                   </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        )}
+
+        {/* Database Tab (Admin Only) */}
+        {userRole === "admin" && (
+          <TabsContent value="database">
+            <Card className="shadow-premium">
+              <CardHeader>
+                <CardTitle>Database Management</CardTitle>
+                <CardDescription>
+                  Manage database content with dummy data for testing
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Warning Alert */}
+                <div className="bg-warning/10 border border-warning/20 rounded-lg p-4 flex items-start gap-3">
+                  <AlertTriangle className="h-5 w-5 text-warning flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-semibold text-warning-foreground">Caution</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      These operations affect the production database. Use carefully in development only.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Add Dummy Data */}
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">Add Dummy Data</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Populate the database with sample test data for development and testing purposes.
+                      This will add {mockTests.length} sample tests to your database.
+                    </p>
+                    <Button
+                      onClick={handleAddDummyData}
+                      disabled={isAddingData}
+                      className="bg-success hover:bg-success/90"
+                    >
+                      <Upload className="h-4 w-4 mr-2" />
+                      {isAddingData ? "Adding Data..." : "Add Dummy Data"}
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="border-t pt-6">
+                  {/* Remove All Data */}
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="text-lg font-semibold mb-2 text-destructive">
+                        Remove All Data
+                      </h3>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Permanently delete all data from the database including tests, students, teachers,
+                        courses, batches, questions, submissions, and notifications. 
+                        <strong> This action cannot be undone!</strong>
+                      </p>
+                      <Button
+                        onClick={handleRemoveAllData}
+                        disabled={isRemovingData}
+                        variant="destructive"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        {isRemovingData ? "Removing Data..." : "Remove All Data"}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Database Statistics */}
+                <div className="border-t pt-6">
+                  <h3 className="text-lg font-semibold mb-4">Database Info</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="bg-muted rounded-lg p-4">
+                      <p className="text-sm text-muted-foreground">Collections</p>
+                      <p className="text-2xl font-bold mt-1">8</p>
+                    </div>
+                    <div className="bg-muted rounded-lg p-4">
+                      <p className="text-sm text-muted-foreground">Mock Tests Available</p>
+                      <p className="text-2xl font-bold mt-1">{mockTests.length}</p>
+                    </div>
+                    <div className="bg-muted rounded-lg p-4">
+                      <p className="text-sm text-muted-foreground">Status</p>
+                      <Badge className="mt-1 bg-success">Connected</Badge>
+                    </div>
+                    <div className="bg-muted rounded-lg p-4">
+                      <p className="text-sm text-muted-foreground">Project</p>
+                      <p className="text-sm font-medium mt-1">Firebase</p>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
