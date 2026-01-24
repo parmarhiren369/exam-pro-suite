@@ -43,12 +43,13 @@ import {
 } from "@/components/ui/select";
 
 export default function TestsManagement() {
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const [tests, setTests] = useState<Test[]>(mockTests);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingTest, setEditingTest] = useState<Test | undefined>();
-  const { toast } = useToast();
 
   const filteredTests = tests.filter((test) => {
     const matchesSearch = test.name
