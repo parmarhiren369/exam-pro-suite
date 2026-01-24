@@ -22,6 +22,7 @@ import Notifications from "./pages/Notifications";
 import Settings from "./pages/Settings";
 import TakeTest from "./pages/TakeTest";
 import TestSubmissions from "./pages/TestSubmissions";
+import Results from "./pages/Results";
 import NotFound from "./pages/NotFound";
 
 type UserRole = "admin" | "teacher" | "student";
@@ -248,6 +249,21 @@ const App = () => {
                         onLogout={handleLogout}
                       >
                         <TestSubmissions />
+                      </DashboardLayout>
+                    }
+                  />
+                )}
+                {/* Results - available for admin and teacher */}
+                {(user.role === "admin" || user.role === "teacher") && (
+                  <Route
+                    path="/results"
+                    element={
+                      <DashboardLayout
+                        role={user.role}
+                        userName={user.name}
+                        onLogout={handleLogout}
+                      >
+                        <Results />
                       </DashboardLayout>
                     }
                   />
