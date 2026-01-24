@@ -22,21 +22,65 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { getTest, getQuestion, createSubmission } from "@/lib/firestore";
+import { Test, Question } from "@/lib/types";
 
 export default function TakeTest() {
   const { testId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Note: In production, fetch test data from API
-  const test = null; // mockTests.find((t) => t.id === testId);
-  const testQuestions: any[] = []; // test ? mockQuestions.slice(0, 10) : [];
-
+  const [test, setTest] = useState<Test | null>(null);
+  const [testQuestions, setTestQuestions] = useState<Question[]>([]);
+  const [loading, setLoading] = useState(true);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [markedForReview, setMarkedForReview] = useState<Set<number>>(new Set());
-  const [timeRemaining, setTimeRemaining] = useState(test?.duration ? test.duration * 60 : 3600); // in seconds
+  const [timeRemaining, setTimeRemaining] = useState(0);
   const [testStarted, setTestStarted] = useState(false);
+
+  useEffect(() => {
+    loadTestData();
+  }, [testId]);
+
+  const loadTestData = async () => {
+    if (!testId) return;
+    
+    try {
+      const testData = await getTest(testId) as Test;
+      if (!testData) {
+        toast({
+          title: "Test Not Found",
+          description: "The test you're looking for doesn't exist.",
+          variant: "destructive",
+        });
+        navigate("/tests");
+        return;
+      }
+
+      setTest(testData);
+      setTimeRemaining(testData.duration * 60);
+
+      // Load all questions
+      const questions: Question[] = [];
+      for (const questionId of testData.questions) {
+        const questionData = await getQuestion(questionId) as Question;
+        if (questionData) {
+          questions.push(questionData);
+        }
+      }
+      setTestQuestions(questions);
+    } catch (error) {
+      console.error('Error loading test:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load test data.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!testStarted) return;
@@ -77,7 +121,9 @@ export default function TakeTest() {
     setMarkedForReview(newMarked);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (!test || !testId) return;
+
     // Calculate score
     let correctCount = 0;
     let wrongCount = 0;
@@ -99,33 +145,37 @@ export default function TakeTest() {
       }
     });
 
-    // Save submission to localStorage (in real app, this would be an API call)
-    const submission = {
-      testId,
-      studentId: "S001",
-      studentName: "Current Student",
-      submittedAt: new Date().toISOString(),
-      answers,
-      score: totalScore,
-      totalMarks: test?.totalMarks || 100,
-      correctCount,
-      wrongCount,
-      unattempted,
-      timeTaken: (test?.duration ? test.duration * 60 : 3600) - timeRemaining,
-    };
+    try {
+      // Save submission to Firebase
+      const submissionId = await createSubmission({
+        testId,
+        studentId: "current-student-id", // TODO: Get from auth context
+        studentName: "Current Student", // TODO: Get from auth context
+        answers: JSON.stringify(answers),
+        score: totalScore,
+        totalMarks: test.totalMarks,
+        correctCount,
+        wrongCount,
+        unattempted,
+        timeTaken: test.duration * 60 - timeRemaining,
+        status: "submitted",
+        feedback: "",
+      });
 
-    const existingSubmissions = JSON.parse(
-      localStorage.getItem("testSubmissions") || "[]"
-    );
-    existingSubmissions.push(submission);
-    localStorage.setItem("testSubmissions", JSON.stringify(existingSubmissions));
+      toast({
+        title: "Test Submitted Successfully!",
+        description: `You scored ${totalScore} out of ${test.totalMarks} marks.`,
+      });
 
-    toast({
-      title: "Test Submitted Successfully!",
-      description: `You scored ${totalScore} out of ${test?.totalMarks || 100} marks.`,
-    });
-
-    navigate("/tests");
+      navigate("/tests");
+    } catch (error) {
+      console.error('Error submitting test:', error);
+      toast({
+        title: "Submission Failed",
+        description: "Failed to submit test. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const getQuestionStatus = (index: number) => {

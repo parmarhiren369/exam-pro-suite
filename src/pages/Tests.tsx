@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import {
@@ -31,12 +31,29 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { Test, TestStatus } from "@/lib/types";
-import { mockTests } from "@/lib/mock-data";
+import { getTests } from "@/lib/firestore";
 
 export default function Tests({ userRole }: { userRole?: string }) {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [courseFilter, setCourseFilter] = useState("all");
+  const [tests, setTests] = useState<Test[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadTests();
+  }, []);
+
+  const loadTests = async () => {
+    try {
+      const fetchedTests = await getTests() as Test[];
+      setTests(fetchedTests);
+    } catch (error) {
+      console.error('Error loading tests:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getStatusConfig = (status: TestStatus) => {
     switch (status) {
@@ -51,7 +68,7 @@ export default function Tests({ userRole }: { userRole?: string }) {
     }
   };
 
-  const filteredTests = mockTests.filter((test) => {
+  const filteredTests = tests.filter((test) => {
     const matchesSearch = test.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCourse = courseFilter === "all" || test.course.includes(courseFilter);
     return matchesSearch && matchesCourse;

@@ -37,20 +37,24 @@ import {
   Search,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { getSubmissions, updateSubmission, getTest, getQuestion } from "@/lib/firestore";
+import { where } from "firebase/firestore";
+import { Test, Question } from "@/lib/types";
 
 interface Submission {
+  id?: string;
   testId: string;
   studentId: string;
   studentName: string;
-  submittedAt: string;
-  answers: Record<number, string>;
+  submittedAt?: string;
+  answers: string; // JSON string
   score: number;
   totalMarks: number;
   correctCount: number;
   wrongCount: number;
   unattempted: number;
   timeTaken: number;
-  evaluatedBy?: string;
+  status: string;
   feedback?: string;
 }
 
@@ -63,53 +67,81 @@ export default function TestSubmissions() {
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [feedback, setFeedback] = useState("");
-
-  // Note: In production, fetch test and questions data from API
-  const test = null; // mockTests.find((t) => t.id === testId);
-  const testQuestions: any[] = []; // mockQuestions.slice(0, 10);
+  const [test, setTest] = useState<Test | null>(null);
+  const [testQuestions, setTestQuestions] = useState<Question[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Load submissions from localStorage
-    const allSubmissions = JSON.parse(localStorage.getItem("testSubmissions") || "[]");
-    const testSubmissions = allSubmissions.filter((sub: Submission) => sub.testId === testId);
-    setSubmissions(testSubmissions);
+    loadData();
   }, [testId]);
+
+  const loadData = async () => {
+    if (!testId) return;
+
+    try {
+      // Load test
+      const testData = await getTest(testId) as Test;
+      setTest(testData);
+
+      // Load questions
+      if (testData) {
+        const questions: Question[] = [];
+        for (const questionId of testData.questions) {
+          const questionData = await getQuestion(questionId) as Question;
+          if (questionData) {
+            questions.push(questionData);
+          }
+        }
+        setTestQuestions(questions);
+      }
+
+      // Load submissions for this test
+      const allSubmissions = await getSubmissions([where("testId", "==", testId)]) as Submission[];
+      setSubmissions(allSubmissions);
+    } catch (error) {
+      console.error('Error loading data:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load submissions.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleViewSubmission = (submission: Submission) => {
     setSelectedSubmission(submission);
     setFeedback(submission.feedback || "");
   };
 
-  const handleSaveFeedback = () => {
-    if (!selectedSubmission) return;
+  const handleSaveFeedback = async () => {
+    if (!selectedSubmission || !selectedSubmission.id) return;
 
-    const allSubmissions = JSON.parse(localStorage.getItem("testSubmissions") || "[]");
-    const updatedSubmissions = allSubmissions.map((sub: Submission) => {
-      if (
-        sub.testId === selectedSubmission.testId &&
-        sub.studentId === selectedSubmission.studentId &&
-        sub.submittedAt === selectedSubmission.submittedAt
-      ) {
-        return {
-          ...sub,
-          feedback,
-          evaluatedBy: "Current Teacher",
-        };
-      }
-      return sub;
-    });
+    try {
+      await updateSubmission(selectedSubmission.id, {
+        feedback,
+        status: "evaluated",
+      });
 
-    localStorage.setItem("testSubmissions", JSON.stringify(updatedSubmissions));
-    setSubmissions(
-      updatedSubmissions.filter((sub: Submission) => sub.testId === testId)
-    );
+      // Reload submissions
+      const allSubmissions = await getSubmissions([where("testId", "==", testId)]) as Submission[];
+      setSubmissions(allSubmissions);
 
-    toast({
-      title: "Feedback Saved",
-      description: "Your feedback has been saved successfully.",
-    });
+      toast({
+        title: "Feedback Saved",
+        description: "Your feedback has been saved successfully.",
+      });
 
-    setSelectedSubmission(null);
+      setSelectedSubmission(null);
+    } catch (error) {
+      console.error('Error saving feedback:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save feedback.",
+        variant: "destructive",
+      });
+    }
   };
 
   const filteredSubmissions = submissions.filter((sub) =>
@@ -202,7 +234,7 @@ export default function TestSubmissions() {
               <div>
                 <p className="text-sm text-muted-foreground">Evaluated</p>
                 <p className="text-3xl font-bold text-foreground mt-1">
-                  {submissions.filter((s) => s.evaluatedBy).length}
+                  {submissions.filter((s) => s.status === "evaluated").length}
                 </p>
               </div>
               <div className="w-12 h-12 rounded-xl bg-success flex items-center justify-center">
@@ -313,7 +345,7 @@ export default function TestSubmissions() {
                       </TableCell>
                       <TableCell>{formatTime(submission.timeTaken)}</TableCell>
                       <TableCell>
-                        {submission.evaluatedBy ? (
+                        {submission.status === "evaluated" ? (
                           <Badge className="bg-success text-success-foreground">
                             Evaluated
                           </Badge>
@@ -380,7 +412,8 @@ export default function TestSubmissions() {
               <div className="space-y-4">
                 <h4 className="font-semibold">Answers Review</h4>
                 {testQuestions.map((question, index) => {
-                  const studentAnswer = selectedSubmission.answers[index];
+                  const answersObj = JSON.parse(selectedSubmission.answers || "{}");
+                  const studentAnswer = answersObj[index];
                   const isCorrect = studentAnswer === question.correctAnswer;
 
                   return (
