@@ -12,6 +12,8 @@ import TeacherDashboard from "./pages/TeacherDashboard";
 import StudentDashboard from "./pages/StudentDashboard";
 import Tests from "./pages/Tests";
 import Analytics from "./pages/Analytics";
+import StudentsManagement from "./pages/StudentsManagement";
+import TestsManagement from "./pages/TestsManagement";
 import NotFound from "./pages/NotFound";
 
 type UserRole = "admin" | "teacher" | "student";
@@ -125,11 +127,53 @@ const App = () => {
                     </DashboardLayout>
                   }
                 />
+                {/* Management Routes - role-based */}
+                {user.role === "admin" && (
+                  <>
+                    <Route
+                      path="/students"
+                      element={
+                        <DashboardLayout
+                          role={user.role}
+                          userName={user.name}
+                          onLogout={handleLogout}
+                        >
+                          <StudentsManagement />
+                        </DashboardLayout>
+                      }
+                    />
+                    <Route
+                      path="/tests-management"
+                      element={
+                        <DashboardLayout
+                          role={user.role}
+                          userName={user.name}
+                          onLogout={handleLogout}
+                        >
+                          <TestsManagement />
+                        </DashboardLayout>
+                      }
+                    />
+                  </>
+                )}
+                {(user.role === "admin" || user.role === "teacher") && (
+                  <Route
+                    path="/tests-management"
+                    element={
+                      <DashboardLayout
+                        role={user.role}
+                        userName={user.name}
+                        onLogout={handleLogout}
+                      >
+                        <TestsManagement />
+                      </DashboardLayout>
+                    }
+                  />
+                )}
                 {/* Placeholder routes - redirect to dashboard */}
                 <Route path="/courses" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/batches" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/teachers" element={<Navigate to="/dashboard" replace />} />
-                <Route path="/students" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/questions" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/schedule" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/results" element={<Navigate to="/dashboard" replace />} />

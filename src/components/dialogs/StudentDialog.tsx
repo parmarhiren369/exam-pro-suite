@@ -1,0 +1,170 @@
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Student } from "@/lib/types";
+import { mockCourses, mockBatches } from "@/lib/mockData";
+
+interface StudentDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  student?: Student;
+  onSave: (student: Partial<Student>) => void;
+}
+
+export function StudentDialog({
+  open,
+  onOpenChange,
+  student,
+  onSave,
+}: StudentDialogProps) {
+  const [formData, setFormData] = useState<Partial<Student>>(
+    student || {
+      name: "",
+      email: "",
+      phone: "",
+      batch: "",
+      rollNumber: "",
+      course: "",
+    }
+  );
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSave(formData);
+    onOpenChange(false);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle>
+            {student ? "Edit Student" : "Add New Student"}
+          </DialogTitle>
+          <DialogDescription>
+            {student
+              ? "Update student information below"
+              : "Fill in the details to add a new student"}
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit}>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Full Name *</Label>
+              <Input
+                id="name"
+                value={formData.name}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email *</Label>
+              <Input
+                id="email"
+                type="email"
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone</Label>
+              <Input
+                id="phone"
+                type="tel"
+                value={formData.phone}
+                onChange={(e) =>
+                  setFormData({ ...formData, phone: e.target.value })
+                }
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="course">Course *</Label>
+              <Select
+                value={formData.course}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, course: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select course" />
+                </SelectTrigger>
+                <SelectContent>
+                  {mockCourses.map((course) => (
+                    <SelectItem key={course.id} value={course.name}>
+                      {course.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="batch">Batch *</Label>
+              <Select
+                value={formData.batch}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, batch: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select batch" />
+                </SelectTrigger>
+                <SelectContent>
+                  {mockBatches.map((batch) => (
+                    <SelectItem key={batch.id} value={batch.name}>
+                      {batch.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="rollNumber">Roll Number *</Label>
+              <Input
+                id="rollNumber"
+                value={formData.rollNumber}
+                onChange={(e) =>
+                  setFormData({ ...formData, rollNumber: e.target.value })
+                }
+                required
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" variant="accent">
+              {student ? "Update" : "Add"} Student
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}

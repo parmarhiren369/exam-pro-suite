@@ -1,5 +1,6 @@
 import { StatCard } from "@/components/ui/stat-card";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 import { 
   Users, 
   GraduationCap, 
@@ -26,6 +27,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 
 export default function AdminDashboard() {
+  const navigate = useNavigate();
+  
   const recentTests = [
     { id: 1, name: "JEE Main Mock Test 15", date: "Today", students: 450, status: "ongoing" },
     { id: 2, name: "NEET Full Syllabus Test", date: "Yesterday", students: 380, status: "completed" },
@@ -70,11 +73,21 @@ export default function AdminDashboard() {
           <p className="text-muted-foreground mt-1">Here's what's happening at your institute today.</p>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline" size="default" className="rounded-xl border-2">
+          <Button 
+            variant="outline" 
+            size="default" 
+            className="rounded-xl border-2"
+            onClick={() => navigate("/tests-management")}
+          >
             <Calendar className="h-4 w-4 mr-2" />
             Schedule Test
           </Button>
-          <Button variant="accent" size="default" className="rounded-xl shadow-glow-accent/30">
+          <Button 
+            variant="accent" 
+            size="default" 
+            className="rounded-xl shadow-glow-accent/30"
+            onClick={() => navigate("/students")}
+          >
             <Plus className="h-4 w-4 mr-2" />
             Quick Actions
           </Button>

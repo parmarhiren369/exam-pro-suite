@@ -1,0 +1,336 @@
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Plus,
+  Search,
+  Edit,
+  Trash2,
+  Play,
+  Clock,
+  Users,
+  FileText,
+  Calendar,
+  Filter,
+} from "lucide-react";
+import { mockTests } from "@/lib/mockData";
+import { Test, TestStatus } from "@/lib/types";
+import { TestDialog } from "@/components/dialogs/TestDialog";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+export default function TestsManagement() {
+  const [tests, setTests] = useState<Test[]>(mockTests);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingTest, setEditingTest] = useState<Test | undefined>();
+  const { toast } = useToast();
+
+  const filteredTests = tests.filter((test) => {
+    const matchesSearch = test.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const matchesStatus =
+      filterStatus === "all" || test.status === filterStatus;
+    return matchesSearch && matchesStatus;
+  });
+
+  const handleAddTest = () => {
+    setEditingTest(undefined);
+    setDialogOpen(true);
+  };
+
+  const handleEditTest = (test: Test) => {
+    setEditingTest(test);
+    setDialogOpen(true);
+  };
+
+  const handleSaveTest = (testData: Partial<Test>) => {
+    if (editingTest) {
+      setTests(
+        tests.map((t) =>
+          t.id === editingTest.id ? { ...t, ...testData } : t
+        )
+      );
+      toast({
+        title: "Test Updated",
+        description: "Test has been updated successfully.",
+      });
+    } else {
+      const newTest: Test = {
+        id: `TEST${(tests.length + 1).toString().padStart(3, "0")}`,
+        questions: [],
+        status: "scheduled",
+        createdBy: "T001",
+        createdAt: new Date().toISOString(),
+        allowedStudents: ["all"],
+        attemptedBy: [],
+        ...(testData as Omit<
+          Test,
+          "id" | "questions" | "status" | "createdBy" | "createdAt"
+        >),
+      };
+      setTests([...tests, newTest]);
+      toast({
+        title: "Test Created",
+        description: "New test has been created successfully.",
+      });
+    }
+  };
+
+  const handleDeleteTest = (id: string) => {
+    setTests(tests.filter((t) => t.id !== id));
+    toast({
+      title: "Test Deleted",
+      description: "Test has been removed from the system.",
+      variant: "destructive",
+    });
+  };
+
+  const getStatusColor = (status: TestStatus) => {
+    switch (status) {
+      case "ongoing":
+        return "bg-success/10 text-success border-success/20";
+      case "completed":
+        return "bg-muted text-muted-foreground";
+      case "scheduled":
+        return "bg-primary/10 text-primary border-primary/20";
+      case "draft":
+        return "bg-warning/10 text-warning border-warning/20";
+      case "cancelled":
+        return "bg-destructive/10 text-destructive border-destructive/20";
+      default:
+        return "";
+    }
+  };
+
+  const stats = {
+    total: tests.length,
+    ongoing: tests.filter((t) => t.status === "ongoing").length,
+    scheduled: tests.filter((t) => t.status === "scheduled").length,
+    completed: tests.filter((t) => t.status === "completed").length,
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
+            <FileText className="h-8 w-8 text-primary" />
+            Tests Management
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            Create, schedule, and manage all tests
+          </p>
+        </div>
+        <Button
+          variant="accent"
+          size="default"
+          className="rounded-xl"
+          onClick={handleAddTest}
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Create New Test
+        </Button>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Total Tests</p>
+                <p className="text-2xl font-bold">{stats.total}</p>
+              </div>
+              <FileText className="h-8 w-8 text-primary" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Ongoing</p>
+                <p className="text-2xl font-bold">{stats.ongoing}</p>
+              </div>
+              <Play className="h-8 w-8 text-success" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Scheduled</p>
+                <p className="text-2xl font-bold">{stats.scheduled}</p>
+              </div>
+              <Clock className="h-8 w-8 text-accent" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Completed</p>
+                <p className="text-2xl font-bold">{stats.completed}</p>
+              </div>
+              <Calendar className="h-8 w-8 text-muted-foreground" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Tests List */}
+      <Card>
+        <CardHeader>
+          <CardTitle>All Tests</CardTitle>
+          <CardDescription>View and manage all test schedules</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search tests..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <Select value={filterStatus} onValueChange={setFilterStatus}>
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <Filter className="h-4 w-4 mr-2" />
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="ongoing">Ongoing</SelectItem>
+                <SelectItem value="scheduled">Scheduled</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
+                <SelectItem value="draft">Draft</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Test Name</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Course</TableHead>
+                  <TableHead>Date & Time</TableHead>
+                  <TableHead>Duration</TableHead>
+                  <TableHead>Marks</TableHead>
+                  <TableHead>Students</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredTests.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={9} className="text-center py-8">
+                      <p className="text-muted-foreground">No tests found</p>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredTests.map((test) => (
+                    <TableRow key={test.id}>
+                      <TableCell className="font-medium">{test.name}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{test.type}</Badge>
+                      </TableCell>
+                      <TableCell className="text-sm">{test.course}</TableCell>
+                      <TableCell>
+                        <div className="flex flex-col">
+                          <span className="font-medium text-sm">
+                            {new Date(test.scheduledDate).toLocaleDateString()}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {test.startTime}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell>{test.duration} min</TableCell>
+                      <TableCell className="font-semibold">
+                        {test.totalMarks}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1">
+                          <Users className="h-3 w-3 text-muted-foreground" />
+                          <span className="text-sm">
+                            {test.attemptedBy.length}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant="outline"
+                          className={getStatusColor(test.status)}
+                        >
+                          {test.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleEditTest(test)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDeleteTest(test.id)}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+
+      <TestDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        test={editingTest}
+        onSave={handleSaveTest}
+      />
+    </div>
+  );
+}
