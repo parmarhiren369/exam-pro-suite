@@ -18,6 +18,8 @@ import CoursesManagement from "./pages/CoursesManagement";
 import BatchesManagement from "./pages/BatchesManagement";
 import TeachersManagement from "./pages/TeachersManagement";
 import ScheduleManagement from "./pages/ScheduleManagement";
+import Notifications from "./pages/Notifications";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 type UserRole = "admin" | "teacher" | "student";
@@ -230,12 +232,33 @@ const App = () => {
                     }
                   />
                 )}
+                {/* Notifications and Settings - available for all roles */}
+                <Route
+                  path="/notifications"
+                  element={
+                    <DashboardLayout
+                      role={user.role}
+                      userName={user.name}
+                      onLogout={handleLogout}
+                    >
+                      <Notifications userRole={user.role} />
+                    </DashboardLayout>
+                  }
+                />
+                <Route
+                  path="/settings"
+                  element={
+                    <DashboardLayout
+                      role={user.role}
+                      userName={user.name}
+                      onLogout={handleLogout}
+                    >
+                      <Settings userRole={user.role} userName={user.name} />
+                    </DashboardLayout>
+                  }
+                />
                 {/* Placeholder routes - redirect to dashboard */}
                 <Route path="/questions" element={<Navigate to="/dashboard" replace />} />
-                <Route path="/results" element={<Navigate to="/dashboard" replace />} />
-                <Route path="/leaderboard" element={<Navigate to="/dashboard" replace />} />
-                <Route path="/notifications" element={<Navigate to="/dashboard" replace />} />
-                <Route path="/settings" element={<Navigate to="/dashboard" replace />} />
               </>
             ) : (
               <Route path="*" element={<Navigate to="/" replace />} />
