@@ -1,8 +1,9 @@
 import OpenAI from 'openai';
 
-// Initialize OpenAI client
+// Initialize OpenAI client (only if API key is available)
+const apiKey = import.meta.env.VITE_OPENAI_API_KEY || 'dummy-key-for-build';
 const openai = new OpenAI({
-  apiKey: import.meta.env.VITE_OPENAI_API_KEY,
+  apiKey,
   dangerouslyAllowBrowser: true // For client-side usage
 });
 
