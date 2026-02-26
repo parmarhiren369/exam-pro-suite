@@ -24,6 +24,7 @@ import TakeTest from "./pages/TakeTest";
 import TestSubmissions from "./pages/TestSubmissions";
 import Results from "./pages/Results";
 import NotFound from "./pages/NotFound";
+import SplashScreen from "./components/SplashScreen";
 
 type UserRole = "admin" | "teacher" | "student";
 
@@ -37,6 +38,7 @@ const queryClient = new QueryClient();
 
 const App = () => {
   const [user, setUser] = useState<User | null>(null);
+  const [showSplash, setShowSplash] = useState(true);
 
   const handleLogin = (role: UserRole, name: string) => {
     const email = `${name.toLowerCase().replace(/\s+/g, '.')}@example.com`;
@@ -59,6 +61,10 @@ const App = () => {
         return <Navigate to="/" replace />;
     }
   };
+
+  if (showSplash) {
+    return <SplashScreen onComplete={() => setShowSplash(false)} />;
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
