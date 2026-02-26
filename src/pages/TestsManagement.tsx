@@ -436,7 +436,7 @@ export default function TestsManagement() {
         </CardContent>
       </Card>
 
-      {console.log('TestDialog render, dialogOpen:', dialogOpen)}
+      
       <TestDialog
         open={dialogOpen}
         onOpenChange={(open) => {
@@ -449,7 +449,7 @@ export default function TestsManagement() {
           }
         }}
         test={editingTest}
-        onSave={handleSaveTest}
+        onSave={(testData, questions) => { handleSaveTest(testData, questions); }}
         initialQuestions={importedQuestions}
         initialMetadata={importedMetadata}
       />

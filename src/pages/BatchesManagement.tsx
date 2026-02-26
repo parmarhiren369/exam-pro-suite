@@ -223,7 +223,7 @@ export default function BatchesManagement() {
                   </TableRow>
                 ) : (
                   filteredBatches.map((batch) => {
-                    const teacher = getTeacherInfo(batch.teacher);
+                    const teacher = { name: batch.teacher || "Unassigned", subject: "N/A" };
                     return (
                       <TableRow key={batch.id} className="hover:bg-muted/50">
                         <TableCell className="font-medium">{batch.name}</TableCell>
